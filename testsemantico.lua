@@ -24,12 +24,28 @@ local function readFile (name)
 	return s
 end
 
-
 local dir = "./test/semNo"
 local arqTeste = {}
 
 local function novoTeste (nomeArq, nerro)
 	table.insert(arqTeste, { nome = nomeArq, nerro = nerro })
+end
+
+function makeTeste (arquivos)
+	for i, v in ipairs(arqTeste) do
+		print(v.nome, v.nerro)
+		local s = readFile(dir .. "/" .. v.nome)
+		erro.inicia()
+		local t, e = parser.parse2(s)
+		assert(t ~= nil, "Erro foi no sintatico")
+		--arvore.imprimeArvore(t)
+		semantica.analisaPrograma(t)
+		local terro = erro.getErros()
+		assert(#terro == v.nerro, "Numero de erros = " .. #terro)
+		for _, e in ipairs(terro) do
+	  	print(e)
+		end 
+	end
 end
 
 novoTeste("decVar.por", 1)
@@ -44,31 +60,20 @@ novoTeste("tipoOpBoolExp.por", 5)
 novoTeste("tipoOpCompExp.por", 6)
 novoTeste("tipoExpCmd.por", 7)
 novoTeste("blocoVazio.por", 1)
+novoTeste("erroPrecOpNao.por", 2)
 
-for i, v in ipairs(arqTeste) do
-	print(v.nome, v.nerro)
-	local s = readFile(dir .. "/" .. v.nome)
-	erro.inicia()
-	local t, e = parser.parse2(s)
-	assert(t ~= nil, "Erro foi no sintatico")
-	--arvore.imprimeArvore(t)
-	semantica.analisaPrograma(t)
-	local terro = erro.getErros()
-	--assert(#terro == v.nerro, "Numero de erros = " .. #terro)
-	--for _, e in ipairs(terro) do
-		--print(e)
-	--end 
-end
+makeTeste(arqTeste)
 print("OK")
 
---[=[local dir = "./test/parserYes"
-
+dir = "./test/semYes"
+arqTeste = {}
 for file in lfs.dir(dir) do
-	if isValid(file) then 
-		local s = readFile(dir .. "/" .. file)
-		assert(parser.parse(s) ~= nil)
+	if isValid(file) then
+		novoTeste(file, 0)
 	end
 end
+
+
+makeTeste(arqTeste)
 print("OK Yes")
-]=]
 

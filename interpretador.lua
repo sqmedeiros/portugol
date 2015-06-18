@@ -11,7 +11,11 @@ local function avalia (exp, ambiente)
 		local v2 = avalia(exp.p2, ambiente)
 		local op = exp.op.op
 		if op == "opSoma" then
-			return v1 + v2
+			if type(v1) == "string" then
+				return v1 .. v2
+			else
+				return v1 + v2
+			end
 		elseif op == "opSub" then
 			return v1 - v2
 		elseif op == "opMult" then
@@ -71,7 +75,7 @@ function execChamada (c, ambiente)
 	if c.nome.v == "saida" then
 		for i, v in ipairs(c.args) do
 			local exp = avalia(v, ambiente)
-			io.write(exp, " ")
+			io.write(tostring(exp), " ")
 		end
 		io.write("\n")
 	elseif c.nome.v == "entrada" then

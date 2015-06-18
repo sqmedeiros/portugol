@@ -100,8 +100,8 @@ local g = re.compile([[
   ExpComp      <- (ExpSomaSub (OPCOMP ExpSomaSub)*) -> noOpCompExp
   ExpSomaSub   <- (Termo  ((SOMA / SUB)  (Termo / ErroExp))*) -> noOpNumExp
   Termo        <- (Fator  ((MULT / DIV / MOD)  (Fator / ErroExp))*) -> noOpNumExp
-  Fator        <- (NAO (Exp / ErroExpNao)) -> noNaoExp  /
-									(SUB (Exp / ErroExp)) -> noMenosUnario / 
+  Fator        <- (NAO (Fator / ErroExpNao)) -> noNaoExp  /
+									(SUB (Fator / ErroExp)) -> noMenosUnario / 
                   ABREPAR  (Exp / ErroExpPar)  (FECHAPAR / ErroFechaPar)  /
                   ChamadaFunc / Numero  / Nome  / Cadeia / VERDADEIRO / FALSO
   ChamadaFunc  <- ((FuncPredef / Nome ABREPAR) ListaExp (FECHAPAR / ErroFechaPar)) -> noChamadaFunc
