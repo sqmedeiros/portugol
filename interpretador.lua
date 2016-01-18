@@ -21,7 +21,12 @@ local function avalia (exp, ambiente)
 		elseif op == "opMult" then
 			return v1 * v2
 		elseif op == "opDiv" then
-			return v1 / v2
+			print("opDiv", exp.p1.tag, exp.p1.tipo)
+			if exp.p1.tipo == Tipo.inteiro and exp.p2.tipo == Tipo.inteiro then 
+				return v1 // v2
+			else
+				return v1 / v2
+			end
 		elseif op == "opMod" then
 			return v1 % v2
 		elseif op == "opMaiorIg" then
