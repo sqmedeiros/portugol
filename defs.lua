@@ -26,21 +26,27 @@ insereToken("ou", "opOu", "||")
 insereToken("nao", "opNao", "!")
 insereToken("nao=", "opDif", "!=")
 
-local Tipo = { naotipado = {}, bool = {}, inteiro = {}, numero = {}, texto = {}, vazio = {} }
+local TipoTag = { array = {}, simples = {}, naotipado = {} }
 
-local Tag = { expBool = {}, expInt = {}, expNum = {}, expTexto = {},
-              expVar = {}, opNumExp = {}, opCompExp = {}, opBoolExp = {},
+local TipoBasico = { naotipado = {}, bool = {}, inteiro = {}, numero = {}, texto = {}, vazio = {} }
+
+local Tag = { expBool = {}, expInt = {}, expNum = {}, expTexto = {}, expArray = {},
+              expVar = {}, expOpNum = {}, expOpComp = {}, expOpBool = {},
               cmdAtrib = {}, cmdRepita = {}, cmdSe = {}, cmdSenaoSe = {},
               cmdChamada = {}, expChamada = {}, expNao = {},
-              decVar = {}, decVarLista = {}, bloco = {}, blocoSenaoSe = {},
-}
+              decVar = {}, decArrayVar = {}, decVarLista = {}, bloco = {},
+							blocoSenaoSe = {},	}
 
 for k, v in pairs(Tag) do
 	Tag[k] = k
 end
 
-for k, v in pairs(Tipo) do
-	Tipo[k] = k
+for k, v in pairs(TipoBasico) do
+	TipoBasico[k] = k
+end
+
+for k, v in pairs(TipoTag) do
+	TipoTag[k] = k
 end
 
 local function getToken (s)
@@ -49,16 +55,17 @@ local function getToken (s)
 	return { op = v.op, cod = v.cod, s = s } 
 end
 
-local function getTipo (t)
-  assert(Tipo[t], t)
-	return Tipo[t]
+local function getTipoBasico(t)
+  assert(TipoBasico[t], t)
+	return TipoBasico[t]
 end
 
 return {
 	linha = linha,
 	getToken = getToken,
-  getTipo = getTipo,
-	Tipo = Tipo,
+  getTipoBasico = getTipoBasico,
 	Tag = Tag,
+	TipoTag = TipoTag,
+	TipoBasico = TipoBasico,
 }
 

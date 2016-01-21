@@ -31,19 +31,22 @@ local function getAmbienteGlobal ()
 	return ambiente[idxGlobal]
 end
 
-local function insereSimbolo (simbolo, ambiente)
+local function insereSimbolo (simbolo, ambiente, ehArray)
 	local n = #ambiente
 	local nome = simbolo.v
+	--print("insere tipo = ", nome)
+	--print("insere tipo = ", simbolo.tipo, simbolo.tipo.basico, simbolo.tipo.tag)
 	if ambiente[n][nome] then
 		erro("O símbolo '" .. nome .. "' jah foi declarado nesse escopo", simbolo.linha) 
 	else
-		ambiente[n][nome] = simbolo
+		ambiente[n][nome] = { v = nome, tipo = simbolo.tipo, ehArray = ehArray }
 	end
 end
 
 local function procuraSimbolo (simbolo, ambiente)
 	local n = #ambiente
 	local nome = simbolo.v
+	--print("procuraSimbolo", nome, simbolo.v)
 	while n >= 1 do
 		if ambiente[n][nome] then
 			return ambiente[n][nome]

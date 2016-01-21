@@ -6,41 +6,241 @@ local erro = require 'erro'
 
 erro = erro.erro
 
-local Tipo = defs.Tipo
+local TipoTag = defs.TipoTag
+local TipoBasico = defs.TipoBasico
 local Tag = defs.Tag
 
 local analisaBloco
 
-local function analisaTipoAtrib (var, exp, ambiente)
-	local tipoExp = tipo.getTipo(exp, ambiente)
-	if tipoExp == Tipo.naotipado then
+function analisaExp (exp, ambiente)
+	assert(ambiente, "Ambiente nulo")
+
+  -- expBool, expInt, expNum, expTexto
+	--if exp.tipo ~= Tipo.naotipado then
+		--return exp.tipo
+	--end
+
+	local tag = exp.tag
+	if tag == Tag.expNao then
+		analisaExpNao(exp, ambiente)
+	elseif tag == Tag.expVar then
+		analisaExpVar(exp, ambiente)
+	elseif tag == Tag.expArray then
+		analisaExpArray(exp, ambiente)
+	elseif tag == Tag.expOpNum then
+		analisaExpOpNum(exp, ambiente)
+	elseif tag == Tag.expOpComp then
+		analisaExpOpComp(exp, ambiente)
+	elseif tag == Tag.expOpBool then
+		analisaExpOpBool(exp, ambiente)
+	elseif tag == Tag.expInt or tag == Tag.expNum or
+         tag == Tag.expBool or tag == Tag.expTexto then
+		return
+	elseif tag == Tag.expChamada then
+		error("Falta analisar chamada de função")
+	else
+		error("Expressão desconhecida " .. exp.tag)	
+	end
+end
+
+function analisaExpNao (exp, ambiente)
+	analisaExp(exp.exp, ambiente)
+	local tipo = exp.exp.tipo 
+	if tipo.tag ~= TipoTag.simples or tipo.basico ~= TipoBasico.bool then
+		erro("expressão do '" .. exp.op.s .. "' deve ser do tipo booleano", exp.exp.linha)
+	end
+end
+
+function analisaExpVar (exp, ambiente)
+	local v = tabsim.procuraSimbolo(exp, ambiente)
+	if v ~= nil then
+		exp.tipo = v.tipo 
+	end
+end
+
+function analisaExpArray (exp, ambiente)
+	--print("expArray", exp, exp.v, exp.tipo, exp.tipo.basico, exp.tipo.tag)
+	local v = tabsim.procuraSimbolo(exp, ambiente)
+	if v ~= nil then
+		if v.tipo.tag ~= TipoTag.array then
+			erro("variável " .. exp.v .. " não é um array", exp.linha)
+		end
+		exp.tipo = v.tipo
+	end
+	local idxExp = exp.exp
+	analisaExp(idxExp, ambiente)
+	
+	if idxExp.tipo.tag ~= TipoTag.simples or idxExp.tipo.basico ~= TipoBasico.inteiro then
+		erro("a expressão que indexa '" .. exp.v.v .. "' deve ser do tipo inteiro", idxExp.linha)
+	end
+end
+
+function analisaExpOpNum (exp, ambiente)
+	local p1 = exp.p1
+	local p2 = exp.p2
+	analisaExp(p1, ambiente)
+	analisaExp(p2, ambiente)
+
+	if tipo.naoTipado(p1.tipo) or tipo.naoTipado(p2.tipo) then
 		return
 	end
-	if not tipo.tiposCompativeis(var.tipo, tipoExp, true) then
-		local s = "Nao pode atribuir expressao do tipo " .. tipoExp .. " à variável "
-    s = s .. "'" .. var.v .. "' do tipo " .. var.tipo
+	
+	if p1.tipo.tag ~= TipoTag.simples or p2.tipo.tag ~= TipoTag.simples then
+		erro("operandos inválidos para o operador binário'" .. exp.op.s .. "'", exp.linha)
+	end
+
+	local tb1 = p1.tipo.basico
+	local tb2 = p2.tipo.basico
+	if tipo.tiposCompativeis(tb1, TipoBasico.numero) and tipo.tiposCompativeis(tb2, TipoBasico.numero) then
+		if exp.op.op == "opMod" then
+			if tb1 ~= TipoBasico.inteiro or tb2 ~= TipoBasico.inteiro then
+				local s = "os operandos de '" .. exp.op.s .. "' devem ser do tipo inteiro"
+				erro(s, exp.linha)
+			else
+				exp.tipo.basico = TipoBasico.inteiro
+			end
+		elseif tb1 == TipoBasico.numero or tb2 == TipoBasico.numero then
+			exp.tipo.basico = TipoBasico.numero
+		else
+			exp.tipo.basico = TipoBasico.inteiro	
+		end
+	elseif	tipo.tiposCompativeis(tb1, TipoBasico.texto) and tipo.tiposCompativeis(tb2, TipoBasico.texto) and
+          exp.op.op == "opSoma" then
+			exp.tipo.basico = TipoBasico.texto	
+	else
+		local s = "não é possível realizar a operação " .. exp.op.s .. " com uma expressão do tipo " .. tb1
+  	s = s .. " e uma expressão do tipo " .. tb2
+		erro(s, exp.linha)
+	end
+end
+	
+
+function analisaExpOpComp (exp, ambiente)
+	local p1 = exp.p1
+	local p2 = exp.p2
+
+	assert(exp.tipo.basico == TipoBasico.bool and exp.tipo.tag == TipoTag.simples)
+	
+	analisaExp(p1, ambiente)
+	analisaExp(p2, ambiente)
+
+	if tipo.naoTipado(p1.tipo) or tipo.naoTipado(p2.tipo) then
+		return
+	end
+
+	if p1.tipo.tag ~= TipoTag.simples or p2.tipo.tag ~= TipoTag.simples then
+		erro("operandos inválidos para o operador binário'" .. exp.op.s .. "'", exp.linha)
+	end
+
+	if not tipo.tiposCompativeis(p1.tipo.basico, p2.tipo.basico) then
+		local s = "não é possível comparar uma expressão do tipo " .. p1.tipo.basico
+    s = s .. " com uma expressão do tipo " .. p2.tipo.basico
+		erro(s, p1.linha)
+	end
+end
+
+function analisaExpOpBool (exp, ambiente)
+	local p1 = exp.p1 
+	local p2 = exp.p2
+
+	analisaExp(p1, ambiente)
+	analisaExp(p2, ambiente)
+
+	if tipo.naoTipado(p1.tipo) or tipo.naoTipado(p2.tipo) then
+		return
+	end
+
+	if p1.tipo.tag ~= TipoTag.simples or p2.tipo.tag ~= TipoTag.simples then
+		erro("operandos inválidos para o operador binário'" .. exp.op.s .. "'", exp.linha)
+	end
+
+	if not tipo.tiposCompativeis(p1.tipo.basico, TipoBasico.bool) or 
+     not tipo.tiposCompativeis(p2.tipo.basico, TipoBasico.bool) then
+		local s = "expressões do '" .. exp.op.s .. "' devem ser do tipo booleano"
+		erro(s, p1.linha)
+	end
+end
+
+
+local function analisaAtrib (var, exp, ambiente)
+	analisaExp(exp, ambiente)
+	
+	if tipo.naoTipado(exp.tipo) then
+		return
+	end
+
+	--print("analisaAtrib ", var, var.v, var.tipo)
+	if not tipo.tiposCompativeis(var.tipo.basico, exp.tipo.basico, true) then
+		local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico .. " à variável "
+    s = s .. "'" .. var.v .. "' do tipo " .. var.tipo.basico
 		erro(s, var.linha)
 	end
 end
 
 local function analisaDecVar (decVar, ambiente)
 	if decVar.exp then
-		analisaTipoAtrib(decVar.var, decVar.exp, ambiente)
+		analisaAtrib(decVar, decVar.exp, ambiente)
 	end
-	tabsim.insereSimbolo(decVar.var, ambiente)
+	tabsim.insereSimbolo(decVar, ambiente)
 end
+
+
+local function ehTamArrayValido (exp)
+	if exp.tag == Tag.expInt then
+		return true
+	elseif exp.tag == Tag.expVar then --TODO: mudar depois pra aceitar variaveis inicializadas
+		return false
+	elseif exp.tag == Tag.expOpNum then
+		return ehTamArrayValido(exp.p1) and ehTamArrayValido(exp.p2)
+	else
+		return false
+	end
+end
+
+
+local function analisaDecArrayVar (decArrayVar, ambiente)
+	analisaExp(decArrayVar.tam, ambiente)
+	
+	if tipo.naoTipado(decArrayVar.tam.tipo) then
+		return
+	end	
+
+	if not tipo.tiposCompativeis(decArrayVar.tam.tipo.basico, TipoBasico.inteiro) then
+		local s = "tamanho do array deve ser uma expressão do tipo inteiro"
+		erro(s, decArrayVar.tam.linha)
+	--elseif not ehTamArrayValido(decArrayVar.tam) then
+			--local s = "tamanho do array deve poder ser determinado em tempo de compilação"
+	--		local s = "expressão que define o tamanho do array deve ser constantepoder ser determinado em tempo de compilação"
+	--		erro(s, decArrayVar.tam.linha)
+	end
+
+	--if decArrayVar.exp then  TODO: permitir inicializar o array na declaração
+		--analisaTipoAtrib(decArrayVar.v, decArrayVar.exp, ambiente)
+	--end
+	--print("DecArrayVar ", decArrayVar.v, decArrayVar.var)
+	tabsim.insereSimbolo(decArrayVar, ambiente, true)
+end
+
 
 local function analisaDecVarLista (listaDec, ambiente)
 	for i, v in ipairs(listaDec) do
-		analisaDecVar(v, ambiente)
+		if v.tag == Tag.decArrayVar then
+			analisaDecArrayVar(v, ambiente)
+		else
+			analisaDecVar(v, ambiente)
+		end
 	end
 end
 
 local function analisaExpCmd (exp, ambiente)
-	local tipoExp = tipo.getTipo(exp, ambiente)
+	analisaExp(exp, ambiente)
 
-	if tipoExp ~= tipo.naotipado and not tipo.tiposCompativeis(tipoExp, Tipo.bool) then
-		local s = "Expressao do 'se' deve ser booleana"
+	if tipo.naoTipado(exp.tipo) then
+		return
+	end	
+
+	if not tipo.tiposCompativeis(exp.tipo.basico, TipoBasico.bool) then
+		local s = "expressão do 'se' deve ser booleana"
 		erro(s, exp.linha)
 	end
 
@@ -72,11 +272,11 @@ end
 function analisaCmdChamada (c, ambiente)
 	if c.nome.v == "saida" then
 		for i, v in ipairs(c.args) do
-			local t = tipo.getTipo(v, ambiente)
+			analisaExp(v, ambiente)
 		end	
 	elseif c.nome.v == "entrada" then
 		for i, v in ipairs(c.args) do
-			local t = tipo.getTipo(v, ambiente)
+			analisaExp(v, ambiente)
 		end	
 	else
 		error("Função inválida")
@@ -89,7 +289,8 @@ local function analisaComando (c, ambiente)
 		local exp = c.p2
 		if var ~= nil then
 			c.p1.tipo = var.tipo
-			analisaTipoAtrib(c.p1, exp, ambiente)
+			--print("analisaComando ", var, var.v, var.tipo, c.p1.tipo)
+			analisaAtrib(c.p1, exp, ambiente)
 		end
 	elseif c.tag == Tag.cmdSe then
 		analisaCmdSe(c, ambiente)
@@ -106,7 +307,7 @@ function analisaBloco (bloco, ambiente)
 	tabsim.entraBloco(ambiente)
 	for i, v in ipairs(bloco.tbloco) do	
 		if v.tag == Tag.decVarLista then
-			analisaDecVarLista(v.lista, ambiente)	
+			analisaDecVarLista(v.lista, ambiente)
 		elseif arvore.ehComando(v) then
 			analisaComando(v, ambiente)
 		else

@@ -1,5 +1,5 @@
 local defs = require 'defs'
-local tab = require 'tabela2'
+local tab = require 'tabinterpretador'
 
 local Tag = defs.Tag
 local Tipo = defs.Tipo
@@ -58,22 +58,29 @@ local function avalia (exp, ambiente)
 	elseif exp.tag == Tag.expTexto then
 		return exp.v
 	elseif exp.tag == Tag.expVar then
-		return tab.getValor(exp.v, ambiente)
+		return tab.getValor(exp, ambiente)
 	elseif exp.tag == Tag.expNao then
 		local v = avalia(exp.exp, ambiente)
 		return not v
+	elseif exp.tag == Tag.expArray then
+		local idx = avalia(exp.exp, ambiente)
+		return tab.getValor(exp, ambiente, idx)
 	else
 		error("Expressao desconhecida3 " .. exp.tag)
 	end
 end
 
+local function decArrayVar (v, ambiente)
+	local tam = avalia(v.tam, ambiente)
+	tab.insereSimbolo(v, tam, ambiente) 
+end
 
 local function decVar (v, ambiente)
 	local exp
 	if v.exp then
 		exp = avalia(v.exp, ambiente)
 	end
-	tab.insereSimbolo(v.var.v, exp, ambiente) 
+	tab.insereSimbolo(v, exp, ambiente) 
 end
 
 function execChamada (c, ambiente)
@@ -88,7 +95,7 @@ function execChamada (c, ambiente)
 			local x
 			repeat
 				--print("vartipo", v.tipo, v.v, v.tag)
-				if v.tipo == Tipo.inteiro or v.tipo == Tipo.numero then
+				if v.tipo.basico == TipoBasico.inteiro or v.tipo.basico == TipoBasico.numero then
 					x = io.read("*n")
 					x = tonumber(x)
 				else
@@ -97,7 +104,11 @@ function execChamada (c, ambiente)
 				
 				--print("x = ", x, x == nil)
 			until  true == true --x ~= nil
-			tab.setValor(v.v, x, ambiente)
+			local idx
+			if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
+				idx = avalia(c.p1.exp, ambiente)
+			end
+			tab.setValor(v, x, ambiente, idx)
 		end
 	else
 		error("Função inválida")
@@ -106,7 +117,11 @@ end
 
 local function decVarLista (dec, ambiente)
 	for i, v in ipairs(dec.lista) do
-		decVar(v, ambiente)
+		if v.tag == Tag.decVar then
+			decVar(v, ambiente)
+		else
+			decArrayVar(v, ambiente)
+		end
 	end
 end
 
@@ -146,7 +161,11 @@ end
 local function execCmd (c, ambiente)
 	if c.tag == Tag.cmdAtrib then
 		local v = avalia(c.p2, ambiente)
-		tab.setValor(c.p1.v, v, ambiente)
+		local idx
+		if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
+			idx = avalia(c.p1.exp, ambiente)
+		end
+		tab.setValor(c.p1, v, ambiente, idx)
 	elseif c.tag == Tag.cmdSe then
 		execCmdSe(c, ambiente)
 	elseif c.tag == Tag.cmdRepita then

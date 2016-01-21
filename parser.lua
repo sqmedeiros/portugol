@@ -20,6 +20,7 @@ newError("erroExpAtrib", "expressão esperada após '='")
 newError("erroExpNao", "expressão esperada após 'nao'")
 newError("erroExpPar", "expressão esperada após '('")
 newError("erroExpVirg", "expressão esperada após ','")
+newError("erroExpArray", "expressão esperada após '['")
 newError("erroExp", "expressão mal formada")
 newError("erroDecNome", "nome esperado após ','")
 newError("erroFim", "'fim' esperado no final do comando")
@@ -27,6 +28,7 @@ newError("erroEnquanto", "'enquanto' esperado após 'repita'")
 newError("erroAtrib", "'=' esperado")
 newError("erroFuncPredef", "'(' esperado após o nome da função")
 newError("erroFechaPar", "Caractere ')' esperado")
+newError("erroFechaCol", "Caractere ']' esperado")
 newError("erroIndefinido", "indefinido")
 
 
@@ -70,11 +72,13 @@ local predef = { ["countLine"] = countLine,
 								 ["noCmdChamada"] = arvore.noCmdChamada,
 								 ["noDecVarL"] = arvore.noDecVarL,
 								 ["noDecVar"] = arvore.noDecVar,
-								 ["noBloco"] = arvore.noBloco
+								 ["noDecArrayVar"] = arvore.noDecArrayVar,
+								 ["noBloco"] = arvore.noBloco,
+								 ["noArrayExp"] = arvore.noArrayExp	
 }
 
 predef["getToken"] = defs.getToken
-predef["getTipo"] = defs.getTipo
+predef["getTipoBasico"] = defs.getTipoBasico
 
 re.setlabels(labelCode)
 
@@ -84,7 +88,9 @@ local g = re.compile([[
   Programa     <- Sp Bloco (!. / ErroIndefinido)
   Bloco        <- (DecVar / Comando)* -> noBloco
   DecVar       <- (Tipo (DecVarAtrib (VIRG DecVarAtrib)*)) -> noDecVarL
-  DecVarAtrib  <- ((Nome / ErroDecNome) (ATRIB (Exp / ErroExpAtrib))?) -> noDecVar
+  DecVarAtrib  <- ArrayVar / PlainVar
+	PlainVar     <- ((Nome / ErroDecNome) (ATRIB (Exp / ErroExpAtrib))?) -> noDecVar
+	ArrayVar     <- ((Nome / ErroDecNome) ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol) (ATRIB (Exp / ErroExpAtrib))?) -> noDecArrayVar
   Comando      <- CmdSe / 
                   CmdRepita / 
                   CmdAtrib  / ChamadaFunc -> noCmdChamada
@@ -92,7 +98,7 @@ local g = re.compile([[
 	CmdSenaoSe   <- (SENAOSE  (Exp / ErroExpSenaoSe) Bloco)* -> noCmdSenaoSe
   CmdSenao     <- (SENAO Bloco)? 
   CmdRepita    <- REPITA  (ENQUANTO / ErroEnquanto)  ((Exp / ErroExpEnq)  Bloco) -> noCmdRepita  CmdFim
-  CmdAtrib     <- (Nome  (ATRIB / ErroAtrib) (Exp / ErroExpAtrib)) -> noCmdAtrib
+  CmdAtrib     <- ((ArrayExp / Nome)  (ATRIB / ErroAtrib) (Exp / ErroExpAtrib)) -> noCmdAtrib
   CmdFim       <- (FIM  /  ErroFim)
   Exp          <- (ExpE  (OU (ExpE / ErroExp))*) -> noOpBoolExp
   ExpE         <- (ExpIgual (E ExpIgual)*) -> noOpBoolExp
@@ -103,13 +109,14 @@ local g = re.compile([[
   Fator        <- (NAO (Fator / ErroExpNao)) -> noNaoExp  /
 									(SUB (Fator / ErroExp)) -> noMenosUnario / 
                   ABREPAR  (Exp / ErroExpPar)  (FECHAPAR / ErroFechaPar)  /
-                  ChamadaFunc / Numero  / Nome  / Cadeia / VERDADEIRO / FALSO
+                  ChamadaFunc / ArrayExp / Numero  / Nome  / Cadeia / VERDADEIRO / FALSO
   ChamadaFunc  <- ((FuncPredef / Nome ABREPAR) ListaExp (FECHAPAR / ErroFechaPar)) -> noChamadaFunc
   FuncPredef   <- (ENTRADA / SAIDA) -> noId (ABREPAR / ErroFuncPredef)
   ListaExp     <- (Exp (VIRG (Exp / ErroExpVirg))*)*
   Nome         <- !RESERVADA {LETRA RestoNome*} -> noId Sp
   RestoNome    <- (LETRA / [0-9] / '_')
   FimNome      <- !RestoNome Sp
+	ArrayExp     <- (Nome ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol)) -> noArrayExp
   Numero       <- Real / Inteiro 
 	Inteiro      <- [0-9]+ -> noInteiro Sp 
   Real         <- ([0-9]* '.' [0-9]+ / [0-9]+ '.' [0-9]*) -> noReal Sp
@@ -128,10 +135,10 @@ local g = re.compile([[
   REPITA       <- 'repita' FimNome
   ENQUANTO     <- 'enquanto' FimNome
   SAIDA        <- 'saida' FimNome
-  INTEIRO      <- 'inteiro' -> getTipo FimNome
-  NUMERO       <- 'numero' -> getTipo FimNome 
-  TEXTO        <- 'texto' -> getTipo FimNome
-  BOOLEANO     <- 'bool' -> getTipo FimNome
+  INTEIRO      <- 'inteiro' -> getTipoBasico FimNome
+  NUMERO       <- 'numero' -> getTipoBasico FimNome 
+  TEXTO        <- 'texto' -> getTipoBasico FimNome
+  BOOLEANO     <- 'bool' -> getTipoBasico FimNome
   MOD          <- 'mod' -> getToken FimNome
   E            <- 'e' -> getToken FimNome
   OU           <- 'ou' -> getToken FimNome
@@ -145,11 +152,13 @@ local g = re.compile([[
   IGUAL        <- '==' -> getToken Sp
   ATRIB        <- '=' !'=' Sp
 	LETRA        <- [a-z] / [A-Z]
+  ABRECOL      <- '[' Sp
   ABREPAR      <- '(' Sp
   SOMA         <- '+' -> getToken Sp 
   SUB          <- '-' -> getToken Sp
   MULT         <- '*' -> getToken Sp
   DIV          <- '/' -> getToken Sp
+  FECHACOL     <- ']' Sp
   FECHAPAR     <- ')' Sp
   VIRG         <- ',' Sp
 	Sp           <- (%nl -> incLinha / %s)* 
@@ -162,9 +171,11 @@ local g = re.compile([[
 	ErroExpNao     <- ErrCount %{erroExpNao}
 	ErroExpPar     <- ErrCount %{erroExpPar}
 	ErroExpVirg    <- ErrCount %{erroExpVirg}
+	ErroExpArray   <- ErrCount %{erroExpArray}
 	ErroExp        <- ErrCount %{erroExp}
 	ErroDecNome    <- ErrCount %{erroDecNome}
 	ErroFechaPar   <- ErrCount %{erroFechaPar}
+	ErroFechaCol   <- ErrCount %{erroFechaCol}
 	ErroFuncPredef <- ErrCount %{erroFuncPredef}
 	ErroIndefinido <- ErrCount %{erroIndefinido}
 	ErroAtrib      <- ErrCount %{erroAtrib}

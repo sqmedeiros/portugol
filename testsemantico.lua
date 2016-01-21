@@ -60,7 +60,10 @@ novoTeste("tipoOpBoolExp.por", 5)
 novoTeste("tipoOpCompExp.por", 6)
 novoTeste("tipoExpCmd.por", 7)
 novoTeste("blocoVazio.por", 1)
-novoTeste("erroPrecOpNao.por", 2)
+novoTeste("erroPrecOpNao.por", 4) -- antes era 2, mas acho que 4 faz mais sentido
+                                  -- erro ao aplicar "nao" a um inteiro, e erro
+                                  -- de comparar um valor bool com um inteiro
+novoTeste("erroArrayDec.por", 4)
 
 makeTeste(arqTeste)
 print("OK")

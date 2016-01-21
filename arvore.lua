@@ -1,6 +1,7 @@
 local defs = require 'defs'
 
-local Tipo = defs.Tipo
+local TipoTag = defs.TipoTag
+local TipoBasico = defs.TipoBasico
 local Tag = defs.Tag
 
 local function imprimeEspaco(n)
@@ -17,7 +18,20 @@ local function imprimeArvore (t, tab, n)
 	tab = tab or 0
   n = n or 2
 	imprimeEspaco(tab)
-	if t.v ~= nil then
+	if t.tag == Tag.decVar then
+    print(t.tag, t.tipo, msgLinha(t.linha))
+		imprimeArvore(t.v, tab + n)
+    if (t.exp) then
+    	imprimeArvore(t.exp, tab + n)
+		end
+	elseif t.tag == Tag.decArrayVar then
+		print(t.tag, t.tipo, msgLinha(t.linha))
+		imprimeArvore(t.v, tab + n)
+		imprimeArvore(t.tam, tab + n)
+    if (t.exp) then
+    	imprimeArvore(t.exp, tab + n)
+		end
+	elseif t.v ~= nil then
 		print(t.tag, t.tipo, t.v, msgLinha(t.linha))
 	elseif t.p1 and t.p2 then
 		print(t.tag, t.tipo, msgLinha(t.linha))
@@ -27,12 +41,6 @@ local function imprimeArvore (t, tab, n)
 		print(t.tag, t.tipo, msgLinha(t.linha))
 		for i, v in ipairs(t.lista) do
 			imprimeArvore(v, tab + n)
-		end
-  elseif t.tag == Tag.decVar then
-    print(t.tag, t.tipo, msgLinha(t.linha))
-		imprimeArvore(t.var, tab + n)
-    if (t.exp) then
-    	imprimeArvore(t.exp, tab + n)
 		end
   elseif t.tag == Tag.bloco then
     print(t.tag, msgLinha(t.linha))
@@ -76,10 +84,15 @@ local function imprimeArvore (t, tab, n)
 	end
 end
 
-local function makeNoV (tag, tipo, v)
-  assert(tag ~= nil and tipo ~= nil, tag, tipo)
+local function makeTipo (tipoTag, tipoBasico)
+	return { tag = tipoTag, basico = tipoBasico }
+end
+
+local function makeNoV (tagNo, tipoTag, tipoBasico, v)
+  assert(tagNo ~= nil and tipoTag ~= nil and tipoBasico ~= nil, tag, tipo)
 	--print("makeNoV", v, defs.linha)
-	return { tag = tag, tipo = tipo, v = v, linha = defs.linha, ehExp = true }
+	return { tag = tagNo, tipo = makeTipo(tipoTag, tipoBasico),
+           v = v, linha = defs.linha, ehExp = true }
 end
 
 local function makeNoOpBin (tag, tipo, op, p1, p2)
@@ -94,38 +107,38 @@ local function makeNoCmd (tag, v, exp)
 end
 
 local function noInteiro (v)
-	return makeNoV(Tag.expInt, Tipo.inteiro, tonumber(v)) 
+	return makeNoV(Tag.expInt, TipoTag.simples, TipoBasico.inteiro, tonumber(v)) 
 end
 
 local function noReal (v)
-	return makeNoV(Tag.expNum, Tipo.numero, tonumber(v))
+	return makeNoV(Tag.expNum, TipoTag.simples, TipoBasico.numero, tonumber(v))
 end
 
 local function noTexto (v)
-	return makeNoV(Tag.expTexto, Tipo.texto, v)
+	return makeNoV(Tag.expTexto, TipoTag.simples, TipoBasico.texto, v)
 end
 
 local function noBoolFalso ()
-	return makeNoV(Tag.expBool, Tipo.bool, false) 
+	return makeNoV(Tag.expBool, TipoTag.simples, TipoBasico.bool, false) 
 end
 
 local function noBoolVerd ()
-	return makeNoV(Tag.expBool, Tipo.bool, true) 
+	return makeNoV(Tag.expBool, TipoTag.simples, TipoBasico.bool, true) 
 end
 
 local function noId (v)
-	return makeNoV(Tag.expVar, Tipo.naotipado, v)
+	return makeNoV(Tag.expVar, TipoTag.naotipado, TipoBasico.naotipado, v)
 end
 
 local function noNaoExp (op, exp)
-	return { tag = Tag.expNao, tipo = Tipo.naotipado, op = op,
+	return { tag = Tag.expNao, tipo = makeTipo(TipoTag.simples, TipoBasico.bool), op = op,
 					 exp = exp, linha = defs.linha, ehExp = true }
 end
 
 local function noMenosUnario (op, exp, exp2)
 	--print("Menos ", op, op.s, exp, exp.v, exp2)
-	return { tag = Tag.opNumExp, tipo = Tipo.naotipado, ehExp = true,
-					 op = op, p1 = noInteiro(0), p2 = exp, linha = defs.linha }
+	return { tag = Tag.expOpNum, tipo = makeTipo(TipoTag.simples, TipoBasico.naotipado),
+           ehExp = true, op = op, p1 = noInteiro(0), p2 = exp, linha = defs.linha }
 end
 
 
@@ -135,11 +148,12 @@ local function noOpBoolExp (...)
 	local i = 2
 	local n = #t
 	
-	assert(n % 2 == 1, "opBoolExp n = " .. n)
+	assert(n % 2 == 1, "expOpBool n = " .. n)
 	while i + 1 <= n do
 		local op = t[i]
 		local p2 = t[i + 1]
-		p1 = makeNoOpBin(Tag.opBoolExp, Tipo.naotipado, op, p1, p2)
+		p1 = makeNoOpBin(Tag.expOpBool, makeTipo(TipoTag.simples, TipoBasico.bool),
+                     op, p1, p2)
 		i = i + 2
 	end
 
@@ -152,15 +166,22 @@ local function noOpCompExp (...)
 	local i = 2
 	local n = #t
 
-	assert(n % 2 == 1, "opCompExp n = " .. n)
+	assert(n % 2 == 1, "expOpComp n = " .. n)
 	while i + 1 <= n do
 		local op = t[i]
 		local p2 = t[i + 1]
-		p1 = makeNoOpBin(Tag.opCompExp, Tipo.naotipado, op, p1, p2)
+		p1 = makeNoOpBin(Tag.expOpComp, makeTipo(TipoTag.simples, TipoBasico.bool),
+                     op, p1, p2)
 		i = i + 2
 	end
 
 	return p1
+end
+
+local function noArrayExp (v, e)
+	--print("arrayExp 123", v.v, e)
+	return { tag = Tag.expArray, tipo = makeTipo(TipoTag.array, TipoBasico.naotipado),
+           v = v.v, exp = e, ehExp = true, linha = defs.linha }	
 end
 
 local function noOpNumExp (...)
@@ -169,25 +190,28 @@ local function noOpNumExp (...)
 	local p1 = t[1]
 	local i = 2
 	local n = #t
-	assert(n % 2 == 1, "opNumExp n = " .. n)
+	assert(n % 2 == 1, "expOpNum n = " .. n)
 	while i + 1 <= n do
 		local op = t[i]
 		local p2 = t[i + 1]
-		p1 = makeNoOpBin(Tag.opNumExp, Tipo.naotipado, op, p1, p2)
+		p1 = makeNoOpBin(Tag.expOpNum, makeTipo(TipoTag.simples, TipoBasico.naotipado),
+                     op, p1, p2)
 		i = i + 2
 	end
 
 	return p1
 end
 
+
+-- TODO: repensar o tipo de uma função: só simples? simples e array?
 local function noChamadaFunc (f, ...)
-	return { tag = Tag.expChamda, tipo = Tipo.naotipado, nome = f,
-           args = { ... }, ehExp = true, linha = defs.linha } 
+	return { tag = Tag.expChamada, tipo = makeTipo(TipoTag.naoTipado, TipoBasico.naotipado),
+           nome = f, args = { ... }, ehExp = true, linha = defs.linha } 
 end
 
 local function noCmdChamada (t)
 	t.tag = Tag.cmdChamada
-	t.tipo = Tipo.vazio
+	t.tipo = makeTipo(TipoTag.simples, TipoBasico.vazio)
 	return t
 end
 
@@ -232,7 +256,15 @@ local function noBloco (...)
 end
 
 local function noDecVar (v, e)
-	return { tag = Tag.decVar, tipo = Tipo.naotipado, var = v, exp = e, linha = defs.linha }
+	--print("DecVar ", v.tipo, v.tipo.tag, v.tipo.basico, v.linha, v.v)
+	return { tag = Tag.decVar, tipo = makeTipo(TipoTag.simples, TipoBasico.naotipado),
+           v = v.v, exp = e, linha = v.linha }
+end
+
+local function noDecArrayVar (v, e1, e2)
+	--print("ArrayVar123", e1, e2, v.v, v.tipo, v.tipo.tag, v.tipo.basico)
+	return { tag = Tag.decArrayVar, tipo = makeTipo(TipoTag.array, TipoBasico.naotipado),
+           v = v.v, tam = e1, exp = e2, linha = v.linha }
 end
 
 local function ehExpressao (e)
@@ -249,12 +281,14 @@ end
 local function noDecVarL (...)
 	local t = { ... }
 	local n = #t
-	local tipo = t[1]
-	local listaDecVar = { tag = Tag.decVarLista, tipo = tipo, linha = defs.linha }
+	local tipoBasico = t[1]
+	--TODO: uma decVarLista não deveria ter tipo, apenas uma DecVar
+	--print("noDecVarL", tipoBasico)
+	local listaDecVar = { tag = Tag.decVarLista, linha = defs.linha }
 	local i = 2
 	while i <= n do
-		t[i].tipo = tipo
-    t[i].var.tipo = tipo
+		--print(t[i].tag)
+		t[i].tipo.basico = tipoBasico
 		i = i + 1		
 	end
 	local lista = table.pack(table.unpack(t, 2, n))
@@ -275,6 +309,7 @@ return {
 	noOpNumExp = noOpNumExp,
 	noOpCompExp = noOpCompExp,
 	noOpBoolExp = noOpBoolExp,
+	noArrayExp = noArrayExp,
 	noCmdAtrib = noCmdAtrib,
 	noCmdRepita = noCmdRepita,
 	noCmdSe = noCmdSe,
@@ -283,6 +318,7 @@ return {
   noCmdChamada = noCmdChamada,
 	noDecVarL = noDecVarL,
 	noDecVar = noDecVar,
+	noDecArrayVar = noDecArrayVar,
 	noBloco = noBloco,
 	imprimeArvore = imprimeArvore,
 	ehComando = ehComando,
