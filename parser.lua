@@ -161,7 +161,8 @@ local g = re.compile([[
   FECHACOL     <- ']' Sp
   FECHAPAR     <- ')' Sp
   VIRG         <- ',' Sp
-	Sp           <- (%nl -> incLinha / %s)* 
+	Sp           <- (%nl -> incLinha / %s / Comentario)*
+  Comentario   <- '//' (!%nl .)*  /  '/*' (!'*/' (%nl -> incLinha / .))* '*/'  
 	ErroExpSe      <- ErrCount %{erroExpSe}
 	ErroExpSenaoSe <- ErrCount %{erroExpSenaoSe}
 	ErroExpEnq     <- ErrCount %{erroExpEnq}
