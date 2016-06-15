@@ -60,7 +60,7 @@ end
 local function setValor (exp, valor, ambiente, idx)
 	local n = #ambiente
 	local nome = exp.v
-	--print("setValor ", nome, exp, exp.v, idx)
+	print("setValor ", nome, exp, exp.v, exp.v.v, idx)
 
 	while n >= 1 do
 		if ambiente[n][nome] then

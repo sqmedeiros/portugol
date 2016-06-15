@@ -126,8 +126,31 @@ local function noBoolVerd ()
 	return makeNoV(Tag.expBool, TipoTag.simples, TipoBasico.bool, true) 
 end
 
+local function noTipo (tipoBase, ...)
+	local n = #{...}
+	print("tipoBase ", tipoBase, #{...})
+	if n == 0 then -- tipo simples
+		return makeTipo(TipoTag.simples, tipoBase)
+	else  -- tipo array
+		return makeTipo(TipoTag.array, tipoBase, n)
+	end
+end
+
 local function noId (v)
 	return makeNoV(Tag.expVar, TipoTag.naotipado, TipoBasico.naotipado, v)
+end
+
+local function noVar (v, ...)
+	local l = { ... }
+	local n = #l
+	print("noVar ", v, v.v, #l)
+	if n > 0 then
+		for i, v in ipairs(l) do
+			print("noVar array", v.tag)
+		end
+	else
+		return makeNoV(Tag.expVar, TipoTag.naotipado, TipoBasico.naotipado, v.v)
+	end
 end
 
 local function noNaoExp (op, exp)
@@ -257,13 +280,13 @@ end
 
 local function noDecVar (v, e)
 	--print("DecVar ", v.tipo, v.tipo.tag, v.tipo.basico, v.linha, v.v)
-	return { tag = Tag.decVar, tipo = makeTipo(TipoTag.simples, TipoBasico.naotipado),
+	return { tag = Tag.decVar, --tipo = makeTipo(TipoTag.simples, TipoBasico.naotipado),
            v = v.v, exp = e, linha = v.linha }
 end
 
 local function noDecArrayVar (v, e1, e2)
 	--print("ArrayVar123", e1, e2, v.v, v.tipo, v.tipo.tag, v.tipo.basico)
-	return { tag = Tag.decArrayVar, tipo = makeTipo(TipoTag.array, TipoBasico.naotipado),
+	return { tag = Tag.decArrayVar, --tipo = makeTipo(TipoTag.array, TipoBasico.naotipado),
            v = v.v, tam = e1, exp = e2, linha = v.linha }
 end
 
@@ -281,14 +304,14 @@ end
 local function noDecVarL (...)
 	local t = { ... }
 	local n = #t
-	local tipoBasico = t[1]
+	local tipo = t[1]
 	--TODO: uma decVarLista não deveria ter tipo, apenas uma DecVar
 	--print("noDecVarL", tipoBasico)
 	local listaDecVar = { tag = Tag.decVarLista, linha = defs.linha }
 	local i = 2
 	while i <= n do
 		--print(t[i].tag)
-		t[i].tipo.basico = tipoBasico
+		t[i].tipo = t[1]
 		i = i + 1		
 	end
 	local lista = table.pack(table.unpack(t, 2, n))
@@ -304,6 +327,8 @@ return {
   noBoolFalso = noBoolFalso,
   noBoolVerd = noBoolVerd,
   noId = noId,
+	noTipo = noTipo,
+	noVar = noVar,
 	noNaoExp = noNaoExp,
 	noMenosUnario = noMenosUnario,
 	noOpNumExp = noOpNumExp,

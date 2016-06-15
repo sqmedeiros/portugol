@@ -74,7 +74,9 @@ local predef = { ["countLine"] = countLine,
 								 ["noDecVar"] = arvore.noDecVar,
 								 ["noDecArrayVar"] = arvore.noDecArrayVar,
 								 ["noBloco"] = arvore.noBloco,
-								 ["noArrayExp"] = arvore.noArrayExp	
+								 ["noArrayExp"] = arvore.noArrayExp,
+								 ["noTipo"] = arvore.noTipo,	
+								 ["noVar"] = arvore.noVar	
 }
 
 predef["getToken"] = defs.getToken
@@ -82,7 +84,7 @@ predef["getTipoBasico"] = defs.getTipoBasico
 
 re.setlabels(labelCode)
 
--- ajustar mensagem de erro no primeiro "Nome" em DecVarAtrib
+-- TODO: ajustar mensagem de erro no primeiro "Nome" em DecVarAtrib
 
 local g = re.compile([[
   Programa     <- Sp Bloco (!. / ErroIndefinido)
@@ -98,7 +100,7 @@ local g = re.compile([[
 	CmdSenaoSe   <- (SENAOSE  (Exp / ErroExpSenaoSe) Bloco)* -> noCmdSenaoSe
   CmdSenao     <- (SENAO Bloco)? 
   CmdRepita    <- REPITA  (ENQUANTO / ErroEnquanto)  ((Exp / ErroExpEnq)  Bloco) -> noCmdRepita  CmdFim
-  CmdAtrib     <- ((ArrayExp / Nome)  (ATRIB / ErroAtrib) (Exp / ErroExpAtrib)) -> noCmdAtrib
+  CmdAtrib     <- (Var (ATRIB / ErroAtrib) (Exp / ErroExpAtrib)) -> noCmdAtrib
   CmdFim       <- (FIM  /  ErroFim)
   Exp          <- (ExpE  (OU (ExpE / ErroExp))*) -> noOpBoolExp
   ExpE         <- (ExpIgual (E ExpIgual)*) -> noOpBoolExp
@@ -109,10 +111,11 @@ local g = re.compile([[
   Fator        <- (NAO (Fator / ErroExpNao)) -> noNaoExp  /
 									(SUB (Fator / ErroExp)) -> noMenosUnario / 
                   ABREPAR  (Exp / ErroExpPar)  (FECHAPAR / ErroFechaPar)  /
-                  ChamadaFunc / ArrayExp / Numero  / Nome  / Cadeia / VERDADEIRO / FALSO
+                  ChamadaFunc / ArrayExp / Numero  / Var  / Cadeia / VERDADEIRO / FALSO
   ChamadaFunc  <- ((FuncPredef / Nome ABREPAR) ListaExp (FECHAPAR / ErroFechaPar)) -> noChamadaFunc
   FuncPredef   <- (ENTRADA / SAIDA) -> noId (ABREPAR / ErroFuncPredef)
   ListaExp     <- (Exp (VIRG (Exp / ErroExpVirg))*)*
+  Var          <- (Nome (ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol))*) -> noVar
   Nome         <- !RESERVADA {LETRA RestoNome*} -> noId Sp
   RestoNome    <- (LETRA / [0-9] / '_')
   FimNome      <- !RestoNome Sp
@@ -123,10 +126,11 @@ local g = re.compile([[
   FALSO        <- 'falso' -> noBoolFalso FimNome
   VERDADEIRO   <- 'verdadeiro' -> noBoolVerd FimNome
   Cadeia       <- '"' (!'"' .)* -> noTexto '"' Sp
-  Tipo         <- INTEIRO / NUMERO / TEXTO / BOOLEANO
+  Tipo         <- (TipoBase ({ABRECOL FECHACOL})*) -> noTipo
+  TipoBase     <- INTEIRO / NUMERO / TEXTO / BOOLEANO
 	RESERVADA    <- SE / SENAOSE / SENAO / FIM / ENTRADA / REPITA / ENQUANTO / SAIDA /
                   INTEIRO / NUMERO / TEXTO / BOOLEANO / FALSO / VERDADEIRO / MOD /
-                  E / OU / NAOIGUAL / NAO
+                  E / OU / NAOIGUAL / NAO / NOVO
   SE           <- 'se' FimNome
   SENAOSE      <- 'senaose' FimNome
   SENAO        <- 'senao' FimNome
@@ -144,6 +148,7 @@ local g = re.compile([[
   OU           <- 'ou' -> getToken FimNome
 	NAOIGUAL     <- 'nao=' -> getToken Sp
   NAO          <- 'nao' -> getToken FimNome
+  NOVO         <- 'novo' -> getToken FimNome
 	OPCOMP       <- MAIORIGUAL / MAIOR / MENORIGUAL / MENOR 
   MAIORIGUAL   <- '>=' -> getToken Sp
   MAIOR        <- '>' -> getToken Sp

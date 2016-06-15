@@ -91,6 +91,7 @@ function analisaExpOpNum (exp, ambiente)
 
 	local tb1 = p1.tipo.basico
 	local tb2 = p2.tipo.basico
+	print("tb1 = ", tb1)
 	if tipo.tiposCompativeis(tb1, TipoBasico.numero) and tipo.tiposCompativeis(tb2, TipoBasico.numero) then
 		if exp.op.op == "opMod" then
 			if tb1 ~= TipoBasico.inteiro or tb2 ~= TipoBasico.inteiro then
@@ -205,7 +206,10 @@ local function analisaDecArrayVar (decArrayVar, ambiente)
 		return
 	end	
 
-	if not tipo.tiposCompativeis(decArrayVar.tam.tipo.basico, TipoBasico.inteiro) then
+	print("DecArrayVar ", decArrayVar.tam.tipo.basico)
+	print("compat", tipo.tiposCompativeis(decArrayVar.tam.tipo.basico, TipoBasico.inteiro))
+	-- TODO: ver onde uso tiposCompativeis e onde quero o próprio tipo
+	if not (decArrayVar.tam.tipo.basico == TipoBasico.inteiro) then
 		local s = "tamanho do array deve ser uma expressão do tipo inteiro"
 		erro(s, decArrayVar.tam.linha)
 	--elseif not ehTamArrayValido(decArrayVar.tam) then

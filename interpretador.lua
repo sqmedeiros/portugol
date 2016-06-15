@@ -1,8 +1,10 @@
 local defs = require 'defs'
 local tab = require 'tabinterpretador'
 
+local TipoTag = defs.TipoTag
+local TipoBasico = defs.TipoBasico
 local Tag = defs.Tag
-local Tipo = defs.Tipo
+
 
 local function avalia (exp, ambiente)
 	assert(ambiente ~= nil)
@@ -21,8 +23,8 @@ local function avalia (exp, ambiente)
 		elseif op == "opMult" then
 			return v1 * v2
 		elseif op == "opDiv" then
-			print("opDiv", exp.p1.tag, exp.p1.tipo)
-			if exp.p1.tipo == Tipo.inteiro and exp.p2.tipo == Tipo.inteiro then 
+			print("opDiv", exp.p1.tag, exp.p1.tipo, exp.p1.tipo.basico)
+			if exp.p1.tipo.basico == TipoBasico.inteiro and exp.p2.tipo.basico == TipoBasico.inteiro then 
 				return v1 // v2
 			else
 				return v1 / v2
@@ -105,9 +107,9 @@ function execChamada (c, ambiente)
 				--print("x = ", x, x == nil)
 			until  true == true --x ~= nil
 			local idx
-			if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
-				idx = avalia(c.p1.exp, ambiente)
-			end
+			--if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
+			--	idx = avalia(c.p1.exp, ambiente)
+			--end
 			tab.setValor(v, x, ambiente, idx)
 		end
 	else
