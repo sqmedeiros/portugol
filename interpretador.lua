@@ -60,14 +60,14 @@ local function avalia (exp, ambiente)
 		return exp.v
 	elseif exp.tag == Tag.expTexto then
 		return exp.v
-	elseif exp.tag == Tag.expVar then
+	elseif exp.tag == Tag.expSimpVar then
 		return tab.getValor(exp, ambiente)
 	elseif exp.tag == Tag.expNao then
 		local v = avalia(exp.exp, ambiente)
 		return not v
-	elseif exp.tag == Tag.expArray then
-		local idx = avalia(exp.exp, ambiente)
-		return tab.getValor(exp, ambiente, idx)
+	--elseif exp.tag == Tag.expArray then
+	--	local idx = avalia(exp.exp, ambiente)
+	--	return tab.getValor(exp, ambiente, idx)
 	elseif exp.tag == Tag.expNovoArray then
 		return avaliaNovoArrayExp(exp, ambiente)
 	elseif exp.tag == Tag.expArrayVar then
@@ -79,6 +79,7 @@ end
 
 function avaliaNovoArrayExp (exp, ambiente)
 	local res = {}
+	print("avaliaNovoArrayExp", exp.nexp, exp.dim)
 	for i, v in ipairs(exp.v) do
 		if v.ehExp then
 			res[i] = avalia(v, ambiente)
@@ -87,16 +88,16 @@ function avaliaNovoArrayExp (exp, ambiente)
 		end
 	end
 
-	return exp.dim, table.unpack(res)
+	return exp.nexp, res
 end
 
 local function decArrayVar (v, ambiente)
-	local exp
-	--if v.exp then
-		--local tam = avalia(v.tam, ambiente)
-	--end]
-	print("decArrayVar", v, v.tipo, v.tipo.dim)
-	tab.insereSimbolo(v, v.tipo.dim, ambiente) 
+	local nexp, t
+	if v.exp then
+		local nexp, t = avaliaNovoArrayExp(v.exp, ambiente)
+	end
+	print("decArrayVar", v, v.v, v.tipo, v.tipo.tag, v.tipo.dim)
+	tab.insereSimbolo(v, nexp, ambiente, v.tipo.dim, t)	
 end
 
 local function decVar (v, ambiente)
@@ -182,14 +183,21 @@ local function execCmdRepita (c, ambiente)
 	end
 end
 
+local function execCmdAtrib (c, ambiente)
+	if c.p2.tag == Tag.expNovoArray then
+		local nexp, t = avalia(c.p2, ambiente)
+	end
+	local v = avalia(c.p2, ambiente)
+	local idx
+	if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
+		idx = avalia(c.p1.exp, ambiente)
+	end
+	tab.setValor(c.p1, v, ambiente, idx)
+end
+
 local function execCmd (c, ambiente)
 	if c.tag == Tag.cmdAtrib then
-		local v = avalia(c.p2, ambiente)
-		local idx
-		if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
-			idx = avalia(c.p1.exp, ambiente)
-		end
-		tab.setValor(c.p1, v, ambiente, idx)
+		execCmdAtrib(c, ambiente)
 	elseif c.tag == Tag.cmdSe then
 		execCmdSe(c, ambiente)
 	elseif c.tag == Tag.cmdRepita then

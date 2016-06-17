@@ -6,11 +6,11 @@ y=0
 
 repita enquanto  z nao= -1
 
-	entrada(x)
+	entrada (x)
 	z=x
 	se x nao=-1 
 		y=y+x
 	fim	
 fim
 
-saida(" a soma eh ",y)
+saida   (" a soma eh ",y)

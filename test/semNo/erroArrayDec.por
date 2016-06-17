@@ -1,4 +1,4 @@
-inteiro a[b] = 1 + 2,
+inteiro[] a[b] = 1 + 2,
 b, c, d[48]
 
 inteiro x, y[1+4]

@@ -1,0 +1,13 @@
+Programa     ->  Bloco
+Bloco        ->  (DecVar / Comando)*
+DecVar       ->  Tipo DecVarAtrib (',' DecVarAtrib)*
+DecVarAtrib  ->  Nome '=' Exp
+Tipo         ->  TipoBase ('[]')*
+TipoBase     ->  inteiro | numero | texto | booleano
+Comando      ->  'se' Exp Bloco ('senaose' Exp Bloco)* ('senao' Bloco)? 'fim' |
+                 'repita' 'enquanto' Exp Bloco 'fim' |
+                 Var '=' Exp |
+                 ChamdaFunc
+Exp          ->  'novo' Tipo '[' Exp ']'
+Var          ->  Nome ('[' Exp ']')* |
+                 

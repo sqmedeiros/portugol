@@ -17,3 +17,7 @@ y[1] = novo inteiro [50]
 y[2][3] = novo inteiro [50]
 
 a = x
+
+a = novo inteiro[10]
+
+a = novo numero[10]
