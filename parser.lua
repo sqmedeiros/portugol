@@ -26,9 +26,12 @@ newError("erroDecNome", "nome esperado após ','")
 newError("erroFim", "'fim' esperado no final do comando")
 newError("erroEnquanto", "'enquanto' esperado após 'repita'")
 newError("erroAtrib", "'=' esperado")
+newError("erroTipo", "nome de tipo esperado após 'novo'")
 newError("erroFuncPredef", "'(' esperado após o nome da função")
-newError("erroFechaPar", "Caractere ')' esperado")
-newError("erroFechaCol", "Caractere ']' esperado")
+newError("erroFechaPar", "caractere ')' esperado")
+newError("erroFechaCol", "caractere ']' esperado")
+newError("erroAbreCol", "caractere '[' esperado")
+newError("erroNovoExpArray", "erro ao inicializar array")
 newError("erroIndefinido", "indefinido")
 
 
@@ -74,7 +77,8 @@ local predef = { ["countLine"] = countLine,
 								 ["noDecVar"] = arvore.noDecVar,
 								 ["noDecArrayVar"] = arvore.noDecArrayVar,
 								 ["noBloco"] = arvore.noBloco,
-								 ["noArrayExp"] = arvore.noArrayExp,
+								 ["noArrayExp"] = arvore.noArrayExp, -- TODO: ver se precisa 
+								 ["noNovoArrayExp"] = arvore.noNovoArrayExp,
 								 ["noTipo"] = arvore.noTipo,	
 								 ["noVar"] = arvore.noVar	
 }
@@ -86,14 +90,15 @@ re.setlabels(labelCode)
 
 -- TODO: ajustar mensagem de erro no primeiro "Nome" em DecVarAtrib
 
+--PlainVar     <- 
+--ArrayVar     <- ((Nome / ErroDecNome) ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol) (ATRIB (Exp / ErroExpAtrib))?) -> noDecArrayVar
+
 local g = re.compile([[
   Programa     <- Sp Bloco (!. / ErroIndefinido)
   Bloco        <- (DecVar / Comando)* -> noBloco
   DecVar       <- (Tipo (DecVarAtrib (VIRG DecVarAtrib)*)) -> noDecVarL
-  DecVarAtrib  <- ArrayVar / PlainVar
-	PlainVar     <- ((Nome / ErroDecNome) (ATRIB (Exp / ErroExpAtrib))?) -> noDecVar
-	ArrayVar     <- ((Nome / ErroDecNome) ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol) (ATRIB (Exp / ErroExpAtrib))?) -> noDecArrayVar
-  Comando      <- CmdSe / 
+  DecVarAtrib  <- ((Nome / ErroDecNome) (ATRIB (Exp / ErroExpAtrib))?) -> noDecVar
+	Comando      <- CmdSe / 
                   CmdRepita / 
                   CmdAtrib  / ChamadaFunc -> noCmdChamada
   CmdSe        <- (SE (Exp / ErroExpSe)  Bloco CmdSenaoSe CmdSenao CmdFim) -> noCmdSe
@@ -109,9 +114,11 @@ local g = re.compile([[
   ExpSomaSub   <- (Termo  ((SOMA / SUB)  (Termo / ErroExp))*) -> noOpNumExp
   Termo        <- (Fator  ((MULT / DIV / MOD)  (Fator / ErroExp))*) -> noOpNumExp
   Fator        <- (NAO (Fator / ErroExpNao)) -> noNaoExp  /
-									(SUB (Fator / ErroExp)) -> noMenosUnario / 
+									(SUB (Fator / ErroExp)) -> noMenosUnario /
+                  NOVO ((TipoBase / ErroTipo) ((ABRECOL / ErroAbreCol) (Exp / ErroExpArray) (FECHACOL / ErroFechaCol)) 
+                                              (ABRECOL (Exp / '' -> 'nil') (FECHACOL / ErroFechaCol))*) -> noNovoArrayExp   / 
                   ABREPAR  (Exp / ErroExpPar)  (FECHAPAR / ErroFechaPar)  /
-                  ChamadaFunc / ArrayExp / Numero  / Var  / Cadeia / VERDADEIRO / FALSO
+                  ChamadaFunc / Numero  / Var  / Cadeia / VERDADEIRO / FALSO
   ChamadaFunc  <- ((FuncPredef / Nome ABREPAR) ListaExp (FECHAPAR / ErroFechaPar)) -> noChamadaFunc
   FuncPredef   <- (ENTRADA / SAIDA) -> noId (ABREPAR / ErroFuncPredef)
   ListaExp     <- (Exp (VIRG (Exp / ErroExpVirg))*)*
@@ -119,7 +126,6 @@ local g = re.compile([[
   Nome         <- !RESERVADA {LETRA RestoNome*} -> noId Sp
   RestoNome    <- (LETRA / [0-9] / '_')
   FimNome      <- !RestoNome Sp
-	ArrayExp     <- (Nome ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol)) -> noArrayExp
   Numero       <- Real / Inteiro 
 	Inteiro      <- [0-9]+ -> noInteiro Sp 
   Real         <- ([0-9]* '.' [0-9]+ / [0-9]+ '.' [0-9]*) -> noReal Sp
@@ -135,10 +141,10 @@ local g = re.compile([[
   SENAOSE      <- 'senaose' FimNome
   SENAO        <- 'senao' FimNome
   FIM          <- 'fim' FimNome
-  ENTRADA      <- 'entrada' FimNome
+  ENTRADA      <- {'entrada'} FimNome
   REPITA       <- 'repita' FimNome
   ENQUANTO     <- 'enquanto' FimNome
-  SAIDA        <- 'saida' FimNome
+  SAIDA        <- {'saida'} FimNome
   INTEIRO      <- 'inteiro' -> getTipoBasico FimNome
   NUMERO       <- 'numero' -> getTipoBasico FimNome 
   TEXTO        <- 'texto' -> getTipoBasico FimNome
@@ -148,7 +154,7 @@ local g = re.compile([[
   OU           <- 'ou' -> getToken FimNome
 	NAOIGUAL     <- 'nao=' -> getToken Sp
   NAO          <- 'nao' -> getToken FimNome
-  NOVO         <- 'novo' -> getToken FimNome
+  NOVO         <- 'novo' FimNome
 	OPCOMP       <- MAIORIGUAL / MAIOR / MENORIGUAL / MENOR 
   MAIORIGUAL   <- '>=' -> getToken Sp
   MAIOR        <- '>' -> getToken Sp
@@ -182,9 +188,12 @@ local g = re.compile([[
 	ErroDecNome    <- ErrCount %{erroDecNome}
 	ErroFechaPar   <- ErrCount %{erroFechaPar}
 	ErroFechaCol   <- ErrCount %{erroFechaCol}
+	ErroAbreCol    <- ErrCount %{erroAbreCol}
+	ErroNovoExpArray <- ErrCount %{erroNovoExpArray}
 	ErroFuncPredef <- ErrCount %{erroFuncPredef}
 	ErroIndefinido <- ErrCount %{erroIndefinido}
 	ErroAtrib      <- ErrCount %{erroAtrib}
+	ErroTipo       <- ErrCount %{erroTipo}
 	ErrCount       <- '' => countLine
 
 ]], predef)

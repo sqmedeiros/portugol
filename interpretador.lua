@@ -5,6 +5,7 @@ local TipoTag = defs.TipoTag
 local TipoBasico = defs.TipoBasico
 local Tag = defs.Tag
 
+local avaliaNovoArrayExp
 
 local function avalia (exp, ambiente)
 	assert(ambiente ~= nil)
@@ -67,14 +68,35 @@ local function avalia (exp, ambiente)
 	elseif exp.tag == Tag.expArray then
 		local idx = avalia(exp.exp, ambiente)
 		return tab.getValor(exp, ambiente, idx)
+	elseif exp.tag == Tag.expNovoArray then
+		return avaliaNovoArrayExp(exp, ambiente)
+	elseif exp.tag == Tag.expArrayVar then
+		return tab.getValor(exp, ambiente)
 	else
 		error("Expressao desconhecida3 " .. exp.tag)
 	end
 end
 
+function avaliaNovoArrayExp (exp, ambiente)
+	local res = {}
+	for i, v in ipairs(exp.v) do
+		if v.ehExp then
+			res[i] = avalia(v, ambiente)
+		else
+			break
+		end
+	end
+
+	return exp.dim, table.unpack(res)
+end
+
 local function decArrayVar (v, ambiente)
-	local tam = avalia(v.tam, ambiente)
-	tab.insereSimbolo(v, tam, ambiente) 
+	local exp
+	--if v.exp then
+		--local tam = avalia(v.tam, ambiente)
+	--end]
+	print("decArrayVar", v, v.tipo, v.tipo.dim)
+	tab.insereSimbolo(v, v.tipo.dim, ambiente) 
 end
 
 local function decVar (v, ambiente)

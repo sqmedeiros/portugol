@@ -84,15 +84,16 @@ local function imprimeArvore (t, tab, n)
 	end
 end
 
-local function makeTipo (tipoTag, tipoBasico)
-	return { tag = tipoTag, basico = tipoBasico }
+local function makeTipo (tipoTag, tipoBasico, dim)
+	return { tag = tipoTag, basico = tipoBasico, dim = dim, linha = defs.linha }
 end
 
-local function makeNoV (tagNo, tipoTag, tipoBasico, v)
-  assert(tagNo ~= nil and tipoTag ~= nil and tipoBasico ~= nil, tag, tipo)
+local function makeNoV (tagNo, tipoTag, tipoBasico, v, dim, t)
+  --print("noV", tagNo, tipoTag, tipoBasico, v, dim, t)
+	assert(tagNo ~= nil and tipoTag ~= nil and tipoBasico ~= nil, tag, tipo)
 	--print("makeNoV", v, defs.linha)
 	return { tag = tagNo, tipo = makeTipo(tipoTag, tipoBasico),
-           v = v, linha = defs.linha, ehExp = true }
+           v = v, linha = defs.linha, ehExp = true, dim = dim, t = t }
 end
 
 local function makeNoOpBin (tag, tipo, op, p1, p2)
@@ -137,19 +138,23 @@ local function noTipo (tipoBase, ...)
 end
 
 local function noId (v)
-	return makeNoV(Tag.expVar, TipoTag.naotipado, TipoBasico.naotipado, v)
+	--print("ID", Tag.expSimpVar, TipoTag.naotipado, TipoBasico.naotipado, v)
+	return makeNoV(Tag.expSimpVar, TipoTag.naotipado, TipoBasico.naotipado, v)
 end
 
 local function noVar (v, ...)
 	local l = { ... }
 	local n = #l
-	print("noVar ", v, v.v, #l)
+	--print("noVar ", v, v.v, #l)
 	if n > 0 then
 		for i, v in ipairs(l) do
-			print("noVar array", v.tag)
+			--print("noVar array", v.tag)
 		end
+		--print(Tag.expArrayVar, TipoTag.naotipado, TipoBasico.naotipado, v.v, n, l)
+		return makeNoV(Tag.expArrayVar, TipoTag.naotipado, TipoBasico.naotipado, v.v, n, l)
 	else
-		return makeNoV(Tag.expVar, TipoTag.naotipado, TipoBasico.naotipado, v.v)
+		--print("here", Tag.expSimpVar, TipoTag.naotipado, TipoBasico.naotipado, v.v)
+		return makeNoV(Tag.expSimpVar, TipoTag.naotipado, TipoBasico.naotipado, v.v)
 	end
 end
 
@@ -201,11 +206,24 @@ local function noOpCompExp (...)
 	return p1
 end
 
-local function noArrayExp (v, e)
-	--print("arrayExp 123", v.v, e)
-	return { tag = Tag.expArray, tipo = makeTipo(TipoTag.array, TipoBasico.naotipado),
-           v = v.v, exp = e, ehExp = true, linha = defs.linha }	
+
+local function noNovoArrayExp (tipoBase, ...)
+	local t = {...}
+	local n = #t
+	local nexp = 0
+	print("noNovoArrayExp", n)
+	for i, v in ipairs(t) do
+		if v == "nil" then
+			break	
+		end
+		print(i, v)
+		print(i, v, v.ehExp, v.v)
+		nexp = nexp + 1
+	end
+	return { tag = Tag.expNovoArray, tipo = makeTipo(TipoTag.array, tipoBase),
+           v = t, dim = n, nexp = nexp, ehExp = true, linha = defs.linha }	
 end
+
 
 local function noOpNumExp (...)
 	local t = { ... }
@@ -284,11 +302,11 @@ local function noDecVar (v, e)
            v = v.v, exp = e, linha = v.linha }
 end
 
-local function noDecArrayVar (v, e1, e2)
+--local function noDecArrayVar (v, e1, e2)
 	--print("ArrayVar123", e1, e2, v.v, v.tipo, v.tipo.tag, v.tipo.basico)
-	return { tag = Tag.decArrayVar, --tipo = makeTipo(TipoTag.array, TipoBasico.naotipado),
-           v = v.v, tam = e1, exp = e2, linha = v.linha }
-end
+--	return { tag = Tag.decArrayVar, --tipo = makeTipo(TipoTag.array, TipoBasico.naotipado),
+  --         v = v.v, tam = e1, exp = e2, linha = v.linha }
+--end
 
 local function ehExpressao (e)
 	return e.ehExp
@@ -308,9 +326,14 @@ local function noDecVarL (...)
 	--TODO: uma decVarLista não deveria ter tipo, apenas uma DecVar
 	--print("noDecVarL", tipoBasico)
 	local listaDecVar = { tag = Tag.decVarLista, linha = defs.linha }
+	local tag = Tag.decVar
+	if tipo.tag == TipoTag.array then
+		tag = Tag.decArrayVar
+	end
 	local i = 2
 	while i <= n do
 		--print(t[i].tag)
+		t[i].tag = tag
 		t[i].tipo = t[1]
 		i = i + 1		
 	end
@@ -335,6 +358,7 @@ return {
 	noOpCompExp = noOpCompExp,
 	noOpBoolExp = noOpBoolExp,
 	noArrayExp = noArrayExp,
+	noNovoArrayExp = noNovoArrayExp,
 	noCmdAtrib = noCmdAtrib,
 	noCmdRepita = noCmdRepita,
 	noCmdSe = noCmdSe,

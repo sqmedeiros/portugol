@@ -23,10 +23,10 @@ function analisaExp (exp, ambiente)
 	local tag = exp.tag
 	if tag == Tag.expNao then
 		analisaExpNao(exp, ambiente)
-	elseif tag == Tag.expVar then
-		analisaExpVar(exp, ambiente)
-	elseif tag == Tag.expArray then
-		analisaExpArray(exp, ambiente)
+	elseif tag == Tag.expSimpVar then
+		analisaExpSimpVar(exp, ambiente)
+	elseif tag == Tag.expArrayVar then
+		analisaExpArrayVar(exp, ambiente)
 	elseif tag == Tag.expOpNum then
 		analisaExpOpNum(exp, ambiente)
 	elseif tag == Tag.expOpComp then
@@ -36,6 +36,8 @@ function analisaExp (exp, ambiente)
 	elseif tag == Tag.expInt or tag == Tag.expNum or
          tag == Tag.expBool or tag == Tag.expTexto then
 		return
+	elseif tag == Tag.expNovoArray then
+		analisaExpNovoArray(exp, ambiente)
 	elseif tag == Tag.expChamada then
 		error("Falta analisar chamada de função")
 	else
@@ -51,14 +53,56 @@ function analisaExpNao (exp, ambiente)
 	end
 end
 
-function analisaExpVar (exp, ambiente)
+function analisaExpSimpVar (exp, ambiente)
 	local v = tabsim.procuraSimbolo(exp, ambiente)
 	if v ~= nil then
 		exp.tipo = v.tipo 
 	end
 end
 
-function analisaExpArray (exp, ambiente)
+function analisaExpArrayVar (exp, ambiente)
+	print("analisaExpArrayVar", exp.v)
+	local v = tabsim.procuraSimbolo(exp, ambiente)
+	if v ~= nil then
+		exp.tipo = v.tipo
+		print("dim", v.tipo.dim, exp.dim)
+		if v.tipo.tag ~= TipoTag.array then 
+			erro("variável '" .. exp.v .. "' não é um array")
+		elseif v.tipo.dim < exp.dim then
+			erro("array '" .. v.v .. "' possui somente " .. v.tipo.dim .. " dimensão(ões)")
+		end
+		for i, x in ipairs(exp.t) do	
+ 			analisaExp(x, ambiente)
+			if x.tipo.basico ~= TipoBasico.inteiro then
+				erro("a expressão que indexa um array deve ser do tipo inteiro", exp.linha)
+			end
+		end
+	end
+end
+
+
+function analisaExpNovoArray (exp, ambiente)
+	print("eueueu", exp, exp.v)
+	for k, v in ipairs(exp.v) do
+		if v.ehExp then
+			print("bla", v.tag, v.tipo.basico)
+			analisaExp(v, ambiente)
+			if v.tipo.basico ~= TipoBasico.inteiro then
+				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", exp.linha)
+			end
+			if v.tipo.tag == TipoTag.array then -- verificar dimensoes do array
+				print("ehArray", v.dim) 
+			end 
+		else
+			print("cabou analisaExpNovoArray")
+			break
+		end	
+	end
+	return exp.dim	
+end
+
+--TODO: parece que fiz essa funcao para tratar variaveis do tipo array
+function analisaExpNovoArrayOld (exp, ambiente)
 	--print("expArray", exp, exp.v, exp.tipo, exp.tipo.basico, exp.tipo.tag)
 	local v = tabsim.procuraSimbolo(exp, ambiente)
 	if v ~= nil then
@@ -170,26 +214,39 @@ local function analisaAtrib (var, exp, ambiente)
 		return
 	end
 
-	--print("analisaAtrib ", var, var.v, var.tipo)
+	print("analisaAtrib ", var, var.v, var.tipo, var.tipo.tag, exp.dim, var.tipo.dim)
 	if not tipo.tiposCompativeis(var.tipo.basico, exp.tipo.basico, true) then
 		local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico .. " à variável "
     s = s .. "'" .. var.v .. "' do tipo " .. var.tipo.basico
 		erro(s, var.linha)
+	elseif exp.tag == Tag.expNovoArray and var.tipo.tag ~= TipoTag.array then
+			erro("variável " .. var.v .. " não é um array", exp.linha)
+	elseif var.tipo.tag == TipoTag.array then
+		local idx = 0
+		if var.t then
+			idx = #var.t
+		end
+		if exp.tag == Tag.expNovoArray then
+			if exp.dim > var.tipo.dim - idx then
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
+			end
+		end
 	end
 end
 
-local function analisaDecVar (decVar, ambiente)
+local function analisaDecVar (decVar, ambiente, ehArray)
 	if decVar.exp then
 		analisaAtrib(decVar, decVar.exp, ambiente)
 	end
-	tabsim.insereSimbolo(decVar, ambiente)
+	print("vou inserir")
+	tabsim.insereSimbolo(decVar, ambiente, ehArray)
 end
 
 
 local function ehTamArrayValido (exp)
 	if exp.tag == Tag.expInt then
 		return true
-	elseif exp.tag == Tag.expVar then --TODO: mudar depois pra aceitar variaveis inicializadas
+	elseif exp.tag == Tag.expSimpVar then --TODO: mudar depois pra aceitar variaveis inicializadas
 		return false
 	elseif exp.tag == Tag.expOpNum then
 		return ehTamArrayValido(exp.p1) and ehTamArrayValido(exp.p2)
@@ -200,39 +257,41 @@ end
 
 
 local function analisaDecArrayVar (decArrayVar, ambiente)
-	analisaExp(decArrayVar.tam, ambiente)
+	print("chamei analisaDecArrayVar")
+	--analisaExp(decArrayVar.tam, ambiente)
 	
-	if tipo.naoTipado(decArrayVar.tam.tipo) then
-		return
-	end	
+	--if tipo.naoTipado(decArrayVar.tam.tipo) then
+	--	return
+	--end	
 
-	print("DecArrayVar ", decArrayVar.tam.tipo.basico)
-	print("compat", tipo.tiposCompativeis(decArrayVar.tam.tipo.basico, TipoBasico.inteiro))
+	--print("DecArrayVar ", decArrayVar.tam.tipo.basico)
+	--print("compat", tipo.tiposCompativeis(decArrayVar.tam.tipo.basico, TipoBasico.inteiro))
 	-- TODO: ver onde uso tiposCompativeis e onde quero o próprio tipo
-	if not (decArrayVar.tam.tipo.basico == TipoBasico.inteiro) then
-		local s = "tamanho do array deve ser uma expressão do tipo inteiro"
-		erro(s, decArrayVar.tam.linha)
+	--if not (decArrayVar.tam.tipo.basico == TipoBasico.inteiro) then
+		--local s = "tamanho do array deve ser uma expressão do tipo inteiro"
+		--erro(s, decArrayVar.tam.linha)
 	--elseif not ehTamArrayValido(decArrayVar.tam) then
 			--local s = "tamanho do array deve poder ser determinado em tempo de compilação"
 	--		local s = "expressão que define o tamanho do array deve ser constantepoder ser determinado em tempo de compilação"
 	--		erro(s, decArrayVar.tam.linha)
-	end
+	--end
 
 	--if decArrayVar.exp then  TODO: permitir inicializar o array na declaração
 		--analisaTipoAtrib(decArrayVar.v, decArrayVar.exp, ambiente)
 	--end
-	--print("DecArrayVar ", decArrayVar.v, decArrayVar.var)
 	tabsim.insereSimbolo(decArrayVar, ambiente, true)
 end
 
 
 local function analisaDecVarLista (listaDec, ambiente)
 	for i, v in ipairs(listaDec) do
-		if v.tag == Tag.decArrayVar then
-			analisaDecArrayVar(v, ambiente)
-		else
-			analisaDecVar(v, ambiente)
-		end
+		--if v.tag == Tag.decArrayVar then
+			--print("DecArrayVAR")
+			--analisaDecArrayVar(v, ambiente)
+		--else
+			--print("DecVar vai")
+			analisaDecVar(v, ambiente, true)
+		--end
 	end
 end
 

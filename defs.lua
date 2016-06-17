@@ -30,12 +30,13 @@ local TipoTag = { array = {}, simples = {}, naotipado = {} }
 
 local TipoBasico = { naotipado = {}, bool = {}, inteiro = {}, numero = {}, texto = {}, vazio = {} }
 
-local Tag = { expBool = {}, expInt = {}, expNum = {}, expTexto = {}, expArray = {},
-              expVar = {}, expOpNum = {}, expOpComp = {}, expOpBool = {},
+local Tag = { decVar = {}, decArrayVar = {}, decVarLista = {}, bloco = {},
               cmdAtrib = {}, cmdRepita = {}, cmdSe = {}, cmdSenaoSe = {},
+              blocoSenaoSe = {},
+              expBool = {}, expInt = {}, expNum = {}, expTexto = {}, expNovoArray = {},
+              expSimpVar = {}, expArrayVar = {}, expOpNum = {}, expOpComp = {}, expOpBool = {},
               cmdChamada = {}, expChamada = {}, expNao = {},
-              decVar = {}, decArrayVar = {}, decVarLista = {}, bloco = {},
-							blocoSenaoSe = {},	}
+}
 
 for k, v in pairs(Tag) do
 	Tag[k] = k
