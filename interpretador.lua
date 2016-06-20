@@ -6,6 +6,7 @@ local TipoBasico = defs.TipoBasico
 local Tag = defs.Tag
 
 local avaliaNovoArrayExp
+local getVarArrayRef
 
 local function avalia (exp, ambiente)
 	assert(ambiente ~= nil)
@@ -24,7 +25,7 @@ local function avalia (exp, ambiente)
 		elseif op == "opMult" then
 			return v1 * v2
 		elseif op == "opDiv" then
-			print("opDiv", exp.p1.tag, exp.p1.tipo, exp.p1.tipo.basico)
+			--print("opDiv", exp.p1.tag, exp.p1.tipo, exp.p1.tipo.basico)
 			if exp.p1.tipo.basico == TipoBasico.inteiro and exp.p2.tipo.basico == TipoBasico.inteiro then 
 				return v1 // v2
 			else
@@ -61,17 +62,19 @@ local function avalia (exp, ambiente)
 	elseif exp.tag == Tag.expTexto then
 		return exp.v
 	elseif exp.tag == Tag.expSimpVar then
-		return tab.getValor(exp, ambiente)
+		local var = tab.getValor(exp, ambiente)
+		return var.v
 	elseif exp.tag == Tag.expNao then
 		local v = avalia(exp.exp, ambiente)
 		return not v
-	--elseif exp.tag == Tag.expArray then
-	--	local idx = avalia(exp.exp, ambiente)
-	--	return tab.getValor(exp, ambiente, idx)
 	elseif exp.tag == Tag.expNovoArray then
 		return avaliaNovoArrayExp(exp, ambiente)
 	elseif exp.tag == Tag.expArrayVar then
-		return tab.getValor(exp, ambiente)
+		local var = tab.getValor(exp, ambiente)
+		--print("expArrayVar", var, var.v, var.tipo, var.tipo.tag, var.tipo.dim)
+		local res = getVarArrayRef(var, 1, exp.t, ambiente)
+		--print("arrayVar2 res = ", res, res.v)
+		return res.v  --TODO: ver o caso de "res" ser um array
 	else
 		error("Expressao desconhecida3 " .. exp.tag)
 	end
@@ -79,7 +82,7 @@ end
 
 function avaliaNovoArrayExp (exp, ambiente)
 	local res = {}
-	print("avaliaNovoArrayExp", exp.nexp, exp.dim)
+	--print("avaliaNovoArrayExp", exp.nexp, exp.dim)
 	for i, v in ipairs(exp.v) do
 		if v.ehExp then
 			res[i] = avalia(v, ambiente)
@@ -91,12 +94,27 @@ function avaliaNovoArrayExp (exp, ambiente)
 	return exp.nexp, res
 end
 
+function getVarArrayRef (v, i, t, ambiente)
+	--print("arrayRef", v, i, t)
+	if t == nil then
+		return v
+	end
+	
+	x = avalia(t[i], ambiente)
+	--print("ref2 ", v, x, v[x], t[i], v.array[x])
+	if i == #t then
+		return v.array[x]		
+	end
+	
+	return getVarArrayRef(v.array[x], i + 1, t, ambiente)
+end
+
 local function decArrayVar (v, ambiente)
 	local nexp, t
 	if v.exp then
 		local nexp, t = avaliaNovoArrayExp(v.exp, ambiente)
 	end
-	print("decArrayVar", v, v.v, v.tipo, v.tipo.tag, v.tipo.dim)
+	--print("decArrayVar", v, v.v, v.tipo, v.tipo.tag, v.tipo.dim)
 	tab.insereSimbolo(v, nexp, ambiente, v.tipo.dim, t)	
 end
 
@@ -127,13 +145,13 @@ function execChamada (c, ambiente)
 					x = io.read()
 				end
 				
-				--print("x = ", x, x == nil)
 			until  true == true --x ~= nil
 			local idx
 			--if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
 			--	idx = avalia(c.p1.exp, ambiente)
 			--end
-			tab.setValor(v, x, ambiente, idx)
+			v = tab.getValor(v, ambiente)
+			tab.setValor(v, x) --TODO: quebrar em getValor e setValor
 		end
 	else
 		error("Função inválida")
@@ -183,16 +201,25 @@ local function execCmdRepita (c, ambiente)
 	end
 end
 
-local function execCmdAtrib (c, ambiente)
+local function execCmdAtrib (c, ambiente)		
+	local var = c.p1
+	local ref = tab.getValor(var, ambiente)
+	if var.tipo.tag == TipoTag.array then
+		ref = getVarArrayRef(ref, 1, var.t, ambiente)
+	end
+
 	if c.p2.tag == Tag.expNovoArray then
 		local nexp, t = avalia(c.p2, ambiente)
+		tab.setValor(ref, t, nexp)
+	else
+		local v = avalia(c.p2, ambiente)
+		--print("simples?", var.dim, #var.t, v, ref, ref.v)
+		if not var.dim or var.dim == #var.t then
+			tab.setValorSimples(ref, v)
+		else
+			tab.setValor(ref, v)
+		end
 	end
-	local v = avalia(c.p2, ambiente)
-	local idx
-	if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
-		idx = avalia(c.p1.exp, ambiente)
-	end
-	tab.setValor(c.p1, v, ambiente, idx)
 end
 
 local function execCmd (c, ambiente)

@@ -129,7 +129,7 @@ end
 
 local function noTipo (tipoBase, ...)
 	local n = #{...}
-	print("tipoBase ", tipoBase, #{...})
+	--print("tipoBase ", tipoBase, #{...})
 	if n == 0 then -- tipo simples
 		return makeTipo(TipoTag.simples, tipoBase)
 	else  -- tipo array
@@ -211,13 +211,13 @@ local function noNovoArrayExp (tipoBase, ...)
 	local t = {...}
 	local n = #t
 	local nexp = 0
-	print("noNovoArrayExp", n)
+	--print("noNovoArrayExp", n)
 	for i, v in ipairs(t) do
 		if v == "nil" then
 			break	
 		end
-		print(i, v)
-		print(i, v, v.ehExp, v.v)
+		--print(i, v)
+		--print(i, v, v.ehExp, v.v)
 		nexp = nexp + 1
 	end
 	return { tag = Tag.expNovoArray, tipo = makeTipo(TipoTag.array, tipoBase),

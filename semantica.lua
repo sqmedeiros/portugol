@@ -61,11 +61,11 @@ function analisaExpSimpVar (exp, ambiente)
 end
 
 function analisaExpArrayVar (exp, ambiente)
-	print("analisaExpArrayVar", exp.v)
+	--print("analisaExpArrayVar", exp.v)
 	local v = tabsim.procuraSimbolo(exp, ambiente)
 	if v ~= nil then
 		exp.tipo = v.tipo
-		print("dim", v.tipo.dim, exp.dim)
+		--print("dim", v.tipo.dim, exp.dim)
 		if v.tipo.tag ~= TipoTag.array then 
 			erro("variável '" .. exp.v .. "' não é um array")
 		elseif v.tipo.dim < exp.dim then
@@ -82,19 +82,19 @@ end
 
 
 function analisaExpNovoArray (exp, ambiente)
-	print("eueueu", exp, exp.v)
+	--print("eueueu", exp, exp.v)
 	for k, v in ipairs(exp.v) do
 		if v.ehExp then
-			print("bla", v.tag, v.tipo.basico)
+			--print("bla", v.tag, v.tipo.basico)
 			analisaExp(v, ambiente)
 			if v.tipo.basico ~= TipoBasico.inteiro then
 				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", exp.linha)
 			end
 			if v.tipo.tag == TipoTag.array then -- verificar dimensoes do array
-				print("ehArray", v.dim) 
+				--print("ehArray", v.dim) 
 			end 
 		else
-			print("cabou analisaExpNovoArray")
+			--print("cabou analisaExpNovoArray")
 			break
 		end	
 	end
@@ -135,7 +135,7 @@ function analisaExpOpNum (exp, ambiente)
 
 	local tb1 = p1.tipo.basico
 	local tb2 = p2.tipo.basico
-	print("tb1 = ", tb1)
+	--print("tb1 = ", tb1)
 	if tipo.tiposCompativeis(tb1, TipoBasico.numero) and tipo.tiposCompativeis(tb2, TipoBasico.numero) then
 		if exp.op.op == "opMod" then
 			if tb1 ~= TipoBasico.inteiro or tb2 ~= TipoBasico.inteiro then
@@ -214,7 +214,7 @@ local function analisaAtrib (var, exp, ambiente)
 		return
 	end
 
-	print("analisaAtrib ", var, var.v, var.tipo, var.tipo.tag, exp.dim, var.tipo.dim)
+	--print("analisaAtrib ", var, var.v, var.tipo, var.tipo.tag, exp.dim, var.tipo.dim)
 	if not tipo.tiposCompativeis(var.tipo.basico, exp.tipo.basico, true) then
 		local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico .. " à variável "
     s = s .. "'" .. var.v .. "' do tipo " .. var.tipo.basico
@@ -238,7 +238,7 @@ local function analisaDecVar (decVar, ambiente, ehArray)
 	if decVar.exp then
 		analisaAtrib(decVar, decVar.exp, ambiente)
 	end
-	print("vou inserir")
+	--print("vou inserir")
 	tabsim.insereSimbolo(decVar, ambiente, ehArray)
 end
 
@@ -257,7 +257,7 @@ end
 
 
 local function analisaDecArrayVar (decArrayVar, ambiente)
-	print("chamei analisaDecArrayVar")
+	--print("chamei analisaDecArrayVar")
 	--analisaExp(decArrayVar.tam, ambiente)
 	
 	--if tipo.naoTipado(decArrayVar.tam.tipo) then

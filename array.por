@@ -1,16 +1,8 @@
 inteiro[] a
 
-inteiro[][] b
+a = novo inteiro[3]
 
-a = novo inteiro[10]
+a[2] = 44
 
-//b = novo inteiro[5][]
-
-inteiro i = 1
-
-repita enquanto i < 10
-	a[i] = i
-	i = i + 1
-fim
-
-
+saida("fim = ", a[3])
+saida("fim = ", a[2])
