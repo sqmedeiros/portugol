@@ -1,12 +1,8 @@
-numero a[5], b
-inteiro x, y[10]
+inteiro[] a
 
-x = 1
-b = a[1]
-saida("tudo bem", b)
-a[1] = 56
-b = a[1]
-saida("tudo bem2", b)
-a[2] = 57
-saida("tudo bem2", a[2])
+a = novo inteiro[3]
 
+a[2] = 44
+
+saida("fim = ", a[3])
+saida("fim = ", a[2])

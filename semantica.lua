@@ -67,9 +67,9 @@ function analisaExpArrayVar (exp, ambiente)
 		exp.tipo = v.tipo
 		--print("dim", v.tipo.dim, exp.dim)
 		if v.tipo.tag ~= TipoTag.array then 
-			erro("variável '" .. exp.v .. "' não é um array")
+			erro("variável '" .. exp.v .. "' não é um array", exp.linha)
 		elseif v.tipo.dim < exp.dim then
-			erro("array '" .. v.v .. "' possui somente " .. v.tipo.dim .. " dimensão(ões)")
+			erro("array '" .. v.v .. "' possui somente " .. v.tipo.dim .. " dimensão(ões)", exp.linha)
 		end
 		for i, x in ipairs(exp.t) do	
  			analisaExp(x, ambiente)
@@ -85,10 +85,10 @@ function analisaExpNovoArray (exp, ambiente)
 	--print("eueueu", exp, exp.v)
 	for k, v in ipairs(exp.v) do
 		if v.ehExp then
-			--print("bla", v.tag, v.tipo.basico)
 			analisaExp(v, ambiente)
+			--print("bla", v.tag, v.tipo.basico, TipoBasico.inteiro, v.v)
 			if v.tipo.basico ~= TipoBasico.inteiro then
-				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", exp.linha)
+				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", v.linha)
 			end
 			if v.tipo.tag == TipoTag.array then -- verificar dimensoes do array
 				--print("ehArray", v.dim) 
@@ -208,6 +208,10 @@ end
 
 
 local function analisaAtrib (var, exp, ambiente)
+	if var.tag == Tag.expArrayVar then
+		analisaExpArrayVar(var, ambiente)
+	end	
+
 	analisaExp(exp, ambiente)
 	
 	if tipo.naoTipado(exp.tipo) then
@@ -227,19 +231,37 @@ local function analisaAtrib (var, exp, ambiente)
 			idx = #var.t
 		end
 		if exp.tag == Tag.expNovoArray then
+			--if var.tipo.basico ~= exp.tipo.basico then
+				--local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico .. " à variável "
+    		--s = s .. "'" .. var.v .. "' do tipo " .. var.tipo.basico
+				--erro(s, var.linha)
+			--end
 			if exp.dim > var.tipo.dim - idx then
 				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 			end
+		elseif exp.tipo.tag == TipoTag.array then
+			local aux = 0
+			if exp.tipo.t then
+				aux = #exp.tipo.t
+			end
+			if var.tipo.dim - idx ~= exp.tipo.dim - aux then
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
+			elseif var.tipo.dim -idx > 0 and var.tipo.basico ~= exp.tipo.basico then
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
+			end
+		elseif var.tipo.dim - idx > 0 then
+			erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 		end
 	end
 end
 
-local function analisaDecVar (decVar, ambiente, ehArray)
+
+local function analisaDecVar (decVar, ambiente)
 	if decVar.exp then
 		analisaAtrib(decVar, decVar.exp, ambiente)
 	end
 	--print("vou inserir")
-	tabsim.insereSimbolo(decVar, ambiente, ehArray)
+	tabsim.insereSimbolo(decVar, ambiente)
 end
 
 
@@ -352,8 +374,13 @@ local function analisaComando (c, ambiente)
 		local exp = c.p2
 		if var ~= nil then
 			c.p1.tipo = var.tipo
-			--print("analisaComando ", var, var.v, var.tipo, c.p1.tipo)
-			analisaAtrib(c.p1, exp, ambiente)
+			--print("analisaComando", var.tipo.tag, var.tipo.dim, c.p1.tipo.dim)
+			if var.tipo.tag == TipoTag.array and var.tipo.dim < c.p1.tipo.dim then
+				erro("array '" .. c.p1.v .. "' possui somente " .. var.tipo.dim .. " dimensão(ões)", c.p1.linha)
+			else
+				--print("analisaComando ", var, var.v, var.tipo, c.p1, c.p1.tipo)
+				analisaAtrib(c.p1, exp, ambiente)
+			end
 		end
 	elseif c.tag == Tag.cmdSe then
 		analisaCmdSe(c, ambiente)

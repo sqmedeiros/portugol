@@ -33,7 +33,7 @@ local function insereSimbolo (var, valor, ambiente, dim, t)
 		--print("INSERE ", var.tipo, var.v, var.tipo.tag, var.tipo.basico)
 		ambiente[n][nome] = { dim = dim, tipo = var.tipo }
 		if valor then
-			inicializaNovoArray(ambiente[n][nome], valor, ambiente, dim, t, 1)
+			inicializaNovoArray(ambiente[n][nome], valor, t, 1)
 		end
 	else
 		local nome = var.v
@@ -41,23 +41,22 @@ local function insereSimbolo (var, valor, ambiente, dim, t)
 	end
 end
 
-local function inicializaNovoArray (var, nexp, dim, t, i)
+local function inicializaNovoArray (var, nexp, t, i)
 	if i > nexp then
 		return
 	else
 		var.array = {}
 		var.n = t[i]
-		--print("Inicializa i = ", i, #t, t[i])
+		print("Inicializa i = ", i, #t, t[i], nexp)
 		if i < #t then
 			for j = 1, var.n do
 				var.array[j] = {}
-				var.n = 0
-				inicializaNovoArray(var.array[j], nexp, dim, t, i + 1)
+				--var.n = 0
+				inicializaNovoArray(var.array[j], nexp, t, i + 1)
 			end
-		else
+		else 
 			for j = 1, var.n do
 				var.array[j] = {}
-				var.array[j].v = -999
 			end
 		end
 	end
@@ -84,24 +83,24 @@ local function getValorArray (var, ambiente, idx)
 end
 
 local function setValor (var, valor, nexp)
-	--print("setValor ", var, var.v, var.array, var.tipo, var.tipo.tag, valor, nexp)
-	
-	if var.tipo.tag == TipoTag.array then
-		if nexp ~= nil then  -- novo array
-			--print("INSERE setValor ", var.tipo.basico, valor[1])
-			inicializaNovoArray(var, nexp, var.tipo.dim, valor, 1)
-		else
+	print("setValor ", var, var.v, var.array, valor, nexp)
+	if type(valor) == "table" then
+		print("vloar2", valor.array, valor.v)
+	end
+
+	if nexp ~= nil then  -- novo array
+		--print("INSERE setValor ", var.tipo.basico, valor[1])
+		print("INSERE", var, var.tag, var.v, var.array)
+		inicializaNovoArray(var, nexp, valor, 1)
+	elseif type(valor) == "table" then
+			print("setArray", var.array, valor, valor.array)
 			var.array = valor.array
 			var.n = valor.n
-		end
 	else
 		var.v = valor
 	end
 end
 
-local function setValorSimples (var, valor)
-	var.v = valor
-end
 
 return {
 	criaAmbiente = criaAmbiente,
@@ -110,6 +109,5 @@ return {
 	insereSimbolo = insereSimbolo,
 	getValor = getValor,
 	setValor = setValor,
-	setValorSimples = setValorSimples
 }
 

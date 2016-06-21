@@ -63,7 +63,11 @@ local function avalia (exp, ambiente)
 		return exp.v
 	elseif exp.tag == Tag.expSimpVar then
 		local var = tab.getValor(exp, ambiente)
-		return var.v
+		if var.array then
+			return var
+		else
+			return var.v
+		end
 	elseif exp.tag == Tag.expNao then
 		local v = avalia(exp.exp, ambiente)
 		return not v
@@ -95,13 +99,19 @@ function avaliaNovoArrayExp (exp, ambiente)
 end
 
 function getVarArrayRef (v, i, t, ambiente)
-	--print("arrayRef", v, i, t)
+	print("arrayRef", v, i, t)
 	if t == nil then
 		return v
 	end
-	
-	x = avalia(t[i], ambiente)
-	--print("ref2 ", v, x, v[x], t[i], v.array[x])
+
+	x = avalia(t[i], ambiente)	
+	print("ref21 ", v, x, v[x], #t, t[i], v.array, v.n)
+	print("ref2 ",  v.array[x])
+
+	if x > v.n then
+		error("Erro: acesso a índice inválido " .. x .. " do array")
+	end
+
 	if i == #t then
 		return v.array[x]		
 	end
@@ -151,7 +161,7 @@ function execChamada (c, ambiente)
 			--	idx = avalia(c.p1.exp, ambiente)
 			--end
 			v = tab.getValor(v, ambiente)
-			tab.setValor(v, x) --TODO: quebrar em getValor e setValor
+			tab.setValor(v, x) 
 		end
 	else
 		error("Função inválida")
@@ -205,20 +215,29 @@ local function execCmdAtrib (c, ambiente)
 	local var = c.p1
 	local ref = tab.getValor(var, ambiente)
 	if var.tipo.tag == TipoTag.array then
+		print("vou pegar ref", var.v, var.dim, ref, ref.array, ref.v)
+		if var.t ~= nil then
+			print("embaixo", var.t, #var.t, var.linha)
+		end
 		ref = getVarArrayRef(ref, 1, var.t, ambiente)
+		--ref.tipo = {}
+		--ref.tipo.dim = var.tim
+		--if var.t ~= nil then
+			--ref.tipo.dim = var.dim - #var.t
+			--print("ref.tipo.dim", var.dim, ref.tipo.dim)
+		--end
 	end
 
 	if c.p2.tag == Tag.expNovoArray then
 		local nexp, t = avalia(c.p2, ambiente)
+		ref.tipo = {}
+		--ref.tipo.dim = var.tipo.dim 	
+		print("cmdAtrib", ref, ref.array, ref.v, nexp, t, t[1], ref.tipo, ref.tipo.dim)
 		tab.setValor(ref, t, nexp)
 	else
 		local v = avalia(c.p2, ambiente)
-		--print("simples?", var.dim, #var.t, v, ref, ref.v)
-		if not var.dim or var.dim == #var.t then
-			tab.setValorSimples(ref, v)
-		else
-			tab.setValor(ref, v)
-		end
+		print("eu", v, c.p2, c.p2.tag)
+		tab.setValor(ref, v)
 	end
 end
 

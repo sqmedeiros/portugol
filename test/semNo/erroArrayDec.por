@@ -1,15 +1,17 @@
-inteiro[] a[b] = 1 + 2,
-b, c, d[48]
+//Erro: tipos incompativeis
+inteiro[] a = 1 + 2
 
-inteiro x, y[1+4]
+inteiro tam = 10
 
-numero h[b+c], /* Posso comentar */ o
+numero[] x = novo numero[tam]
 
-/* usando múltiplas
-   linhas
-   como aqui */
-bool  a["bola"/* Comento */] //Outro comentario
+numero tam2
 
-bool f[b+o]
+//Erro: tam2 nao eh inteiro
+numero[] y = novo numero[tam2]
 
-/* Mais um comentario */ inteiro a
+//Erro: tipos incompativeis
+numero[] z = a
+
+//Erro: tipos incompativeis
+numero[] w = a[1]

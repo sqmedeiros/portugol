@@ -41,7 +41,7 @@ function makeTeste (arquivos)
 		--arvore.imprimeArvore(t)
 		semantica.analisaPrograma(t)
 		local terro = erro.getErros()
-		--assert(#terro == v.nerro, "Numero de erros = " .. #terro)
+		assert(#terro == v.nerro, "Numero de erros = " .. #terro)
 		for _, e in ipairs(terro) do
 	  	print(e)
 		end 
@@ -63,7 +63,8 @@ novoTeste("blocoVazio.por", 1)
 novoTeste("erroPrecOpNao.por", 4) -- antes era 2, mas acho que 4 faz mais sentido
                                   -- erro ao aplicar "nao" a um inteiro, e erro
                                   -- de comparar um valor bool com um inteiro
-novoTeste("erroArrayDec.por", 3)
+novoTeste("erroArrayDec.por", 4)
+novoTeste("erroArray1.por", 6)
 
 makeTeste(arqTeste)
 print("OK")

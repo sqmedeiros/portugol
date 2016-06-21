@@ -31,7 +31,7 @@ local function getAmbienteGlobal ()
 	return ambiente[idxGlobal]
 end
 
-local function insereSimbolo (simbolo, ambiente, ehArray)
+local function insereSimbolo (simbolo, ambiente)
 	local n = #ambiente
 	local nome = simbolo.v
 	--print("insere tipo = ", nome)
@@ -39,7 +39,7 @@ local function insereSimbolo (simbolo, ambiente, ehArray)
 	if ambiente[n][nome] then
 		erro("o símbolo '" .. nome .. "' jah foi declarado nesse escopo", simbolo.linha) 
 	else
-		ambiente[n][nome] = { v = nome, tipo = simbolo.tipo, ehArray = ehArray }
+		ambiente[n][nome] = { v = nome, tipo = simbolo.tipo }
 	end
 end
 
