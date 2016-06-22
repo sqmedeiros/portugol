@@ -100,7 +100,7 @@ novoTeste("blocoVazio.por", 1)
 novoTeste("erroPrecOpNao.por", 4) -- antes era 2, mas acho que 4 faz mais sentido
                                   -- erro ao aplicar "nao" a um inteiro, e erro
                                   -- de comparar um valor bool com um inteiro
-novoTeste("erroArrayDec.por", 4)
+novoTeste("erroArrayDec.por", 7)
 novoTeste("erroArray1.por", 6)
 novoTeste("erroArrayOpBin.por", 9)
 

@@ -91,8 +91,22 @@ function analisaExpNovoArray (exp, ambiente)
 				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", v.linha)
 			end
 			if v.tipo.tag == TipoTag.array then -- verificar dimensoes do array
-				--print("ehArray", v.dim) 
-			end 
+				local n = 0
+				if v.tag == Tag.expNovoArray then
+					n = 1	
+				else -- eh variavel
+					local ref = tabsim.procuraSimbolo(v, ambiente)
+					if ref then
+						n = ref.tipo.dim
+					end
+					if v.dim then
+						n = n - v.dim
+					end
+				end
+				if n ~= 0 then
+					erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", v.linha)
+				end 
+			end
 		else
 			--print("cabou analisaExpNovoArray")
 			break

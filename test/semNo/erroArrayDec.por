@@ -15,3 +15,16 @@ numero[] z = a
 
 //Erro: tipos incompativeis
 numero[] w = a[1]
+
+//Erro: expressao nao eh um inteiro
+numero[] a1 = novo numero[novo inteiro[8]]
+
+//Erro: expressao nao eh um inteiro
+numero[] a2 = novo numero[1 == 2]
+
+//Erro: expressao nao eh um inteiro
+numero[] a3 = novo numero[a]
+
+numero[] a4 = novo numero[a[1]]
+
+

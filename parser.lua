@@ -90,9 +90,6 @@ re.setlabels(labelCode)
 
 -- TODO: ajustar mensagem de erro no primeiro "Nome" em DecVarAtrib
 
---PlainVar     <- 
---ArrayVar     <- ((Nome / ErroDecNome) ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol) (ATRIB (Exp / ErroExpAtrib))?) -> noDecArrayVar
-
 local g = re.compile([[
   Programa     <- Sp Bloco (!. / ErroIndefinido)
   Bloco        <- (DecVar / Comando)* -> noBloco
