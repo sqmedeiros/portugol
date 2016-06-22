@@ -101,36 +101,45 @@ function analisaExpNovoArray (exp, ambiente)
 	return exp.dim	
 end
 
---TODO: parece que fiz essa funcao para tratar variaveis do tipo array
-function analisaExpNovoArrayOld (exp, ambiente)
-	--print("expArray", exp, exp.v, exp.tipo, exp.tipo.basico, exp.tipo.tag)
-	local v = tabsim.procuraSimbolo(exp, ambiente)
-	if v ~= nil then
-		if v.tipo.tag ~= TipoTag.array then
-			erro("variável " .. exp.v .. " não é um array", exp.linha)
-		end
-		exp.tipo = v.tipo
-	end
-	local idxExp = exp.exp
-	analisaExp(idxExp, ambiente)
-	
-	if idxExp.tipo.tag ~= TipoTag.simples or idxExp.tipo.basico ~= TipoBasico.inteiro then
-		erro("a expressão que indexa '" .. exp.v.v .. "' deve ser do tipo inteiro", idxExp.linha)
-	end
-end
 
-function analisaExpOpNum (exp, ambiente)
+function analisaExpOpBin (exp, ambiente)
 	local p1 = exp.p1
 	local p2 = exp.p2
+
 	analisaExp(p1, ambiente)
 	analisaExp(p2, ambiente)
 
 	if tipo.naoTipado(p1.tipo) or tipo.naoTipado(p2.tipo) then
 		return
 	end
-	
-	if p1.tipo.tag ~= TipoTag.simples or p2.tipo.tag ~= TipoTag.simples then
+
+	local n1, n2 = 0, 0
+	if p1.tipo.tag == TipoTag.array then
+		local v1 = tabsim.procuraSimbolo(p1, ambiente)
+		if v1 then
+			n1 = v1.tipo.dim - p1.dim
+		end
+	end
+	if p2.tipo.tag == TipoTag.array then
+		local v2 = tabsim.procuraSimbolo(p2, ambiente)
+		if v2 then
+			n2 = v2.tipo.dim - p2.dim
+		end	
+	end
+		
+	if n1 ~= 0 or n2 ~= 0 then 
 		erro("operandos inválidos para o operador binário'" .. exp.op.s .. "'", exp.linha)
+	end
+end
+
+function analisaExpOpNum (exp, ambiente)
+	analisaExpOpBin(exp, ambiente)
+	
+	local p1 = exp.p1
+	local p2 = exp.p2
+
+	if tipo.naoTipado(p1.tipo) or tipo.naoTipado(p2.tipo) then
+		return
 	end
 
 	local tb1 = p1.tipo.basico
@@ -161,20 +170,15 @@ end
 	
 
 function analisaExpOpComp (exp, ambiente)
+	assert(exp.tipo.basico == TipoBasico.bool and exp.tipo.tag == TipoTag.simples)
+
+	analisaExpOpBin(exp, ambiente)
+
 	local p1 = exp.p1
 	local p2 = exp.p2
-
-	assert(exp.tipo.basico == TipoBasico.bool and exp.tipo.tag == TipoTag.simples)
 	
-	analisaExp(p1, ambiente)
-	analisaExp(p2, ambiente)
-
 	if tipo.naoTipado(p1.tipo) or tipo.naoTipado(p2.tipo) then
 		return
-	end
-
-	if p1.tipo.tag ~= TipoTag.simples or p2.tipo.tag ~= TipoTag.simples then
-		erro("operandos inválidos para o operador binário'" .. exp.op.s .. "'", exp.linha)
 	end
 
 	if not tipo.tiposCompativeis(p1.tipo.basico, p2.tipo.basico) then
@@ -185,18 +189,13 @@ function analisaExpOpComp (exp, ambiente)
 end
 
 function analisaExpOpBool (exp, ambiente)
+	analisaExpOpBin(exp, ambiente)
+
 	local p1 = exp.p1 
 	local p2 = exp.p2
 
-	analisaExp(p1, ambiente)
-	analisaExp(p2, ambiente)
-
 	if tipo.naoTipado(p1.tipo) or tipo.naoTipado(p2.tipo) then
 		return
-	end
-
-	if p1.tipo.tag ~= TipoTag.simples or p2.tipo.tag ~= TipoTag.simples then
-		erro("operandos inválidos para o operador binário'" .. exp.op.s .. "'", exp.linha)
 	end
 
 	if not tipo.tiposCompativeis(p1.tipo.basico, TipoBasico.bool) or 
