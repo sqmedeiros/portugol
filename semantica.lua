@@ -115,21 +115,29 @@ function analisaExpOpBin (exp, ambiente)
 
 	local n1, n2 = 0, 0
 	if p1.tipo.tag == TipoTag.array then
-		local v1 = tabsim.procuraSimbolo(p1, ambiente)
-		if v1 then
-			n1 = v1.tipo.dim
-		end
-		if p1.dim then
-			n1 = n1 - p1.dim
+		if p1.tag == Tag.expNovoArray then
+			n1 = 1	
+		else -- eh variavel
+			local v1 = tabsim.procuraSimbolo(p1, ambiente)
+			if v1 then
+				n1 = v1.tipo.dim
+			end
+			if p1.dim then
+				n1 = n1 - p1.dim
+			end
 		end
 	end
 	if p2.tipo.tag == TipoTag.array then
-		local v2 = tabsim.procuraSimbolo(p2, ambiente)
-		if v2 then
-			n2 = v2.tipo.dim
-		end	
-		if p2.dim then
-			n2 = n2 - p2.dim
+		if p2.tag == Tag.expNovoArray then
+			n2 = 1	
+		else -- eh variavel
+			local v2 = tabsim.procuraSimbolo(p2, ambiente)
+			if v2 then
+				n2 = v2.tipo.dim
+			end	
+			if p2.dim then
+				n2 = n2 - p2.dim
+			end
 		end
 	end
 		

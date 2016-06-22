@@ -20,3 +20,10 @@ a = a + c
 a = b[1] + c[1]
 
 c[2][3] = a + b[2] + c[1][2]
+
+//Erro: não pode usar "novo"
+a = a + novo inteiro[10]
+
+se novo inteiro[4] > novo inteiro[8]
+	c[a][a] = 1
+fim
