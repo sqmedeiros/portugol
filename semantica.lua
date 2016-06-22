@@ -117,18 +117,24 @@ function analisaExpOpBin (exp, ambiente)
 	if p1.tipo.tag == TipoTag.array then
 		local v1 = tabsim.procuraSimbolo(p1, ambiente)
 		if v1 then
-			n1 = v1.tipo.dim - p1.dim
+			n1 = v1.tipo.dim
+		end
+		if p1.dim then
+			n1 = n1 - p1.dim
 		end
 	end
 	if p2.tipo.tag == TipoTag.array then
 		local v2 = tabsim.procuraSimbolo(p2, ambiente)
 		if v2 then
-			n2 = v2.tipo.dim - p2.dim
+			n2 = v2.tipo.dim
 		end	
+		if p2.dim then
+			n2 = n2 - p2.dim
+		end
 	end
 		
 	if n1 ~= 0 or n2 ~= 0 then 
-		erro("operandos inválidos para o operador binário'" .. exp.op.s .. "'", exp.linha)
+		erro("operandos inválidos para o operador binário '" .. exp.op.s .. "'", p1.linha)
 	end
 end
 

@@ -102,6 +102,7 @@ novoTeste("erroPrecOpNao.por", 4) -- antes era 2, mas acho que 4 faz mais sentid
                                   -- de comparar um valor bool com um inteiro
 novoTeste("erroArrayDec.por", 4)
 novoTeste("erroArray1.por", 6)
+novoTeste("erroArrayOpBin.por", 7)
 
 local dir = "./test/semNo"
 makeTeste(arqTeste, dir)
