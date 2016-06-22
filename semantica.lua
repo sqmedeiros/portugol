@@ -10,9 +10,37 @@ local TipoTag = defs.TipoTag
 local TipoBasico = defs.TipoBasico
 local Tag = defs.Tag
 
-local analisaBloco
+local analisaBloco, analisaExpNao
+local analisaExpSimpVar, analisaExpArrayVar, analisaExpNovoArray
+local analisaExpOpBin, analisaExpOpNum, analisaExpOpComp, analisaExpOpBool 
 
-function analisaExp (exp, ambiente)
+-- 0 significa um valor basico
+-- 1 significa um valor de uma dimensao, etc
+local function getVarDim (v, ambiente)
+	assert(v.tag == Tag.expSimpVar or v.tag == Tag.expArrayVar)
+	local ref = tabsim.procuraSimbolo(v, ambiente)
+	if not ref then --nao achou variavel (eh possivel?)
+		return 0 
+	end
+	local n = ref.tipo.dim
+	if v.dim then
+		n = n - v.dim
+	end
+	return n
+end
+
+local function ehValorBasico (v, ambiente)
+	if v.tipo.tag ~= TipoTag.array then
+		return true
+	end
+	if v.tag == Tag.expNovoArray then
+		return false
+	end
+	-- eh uma variavel
+	return getVarDim(v, ambiente) == 0
+end
+
+local function analisaExp (exp, ambiente)
 	assert(ambiente, "Ambiente nulo")
 
   -- expBool, expInt, expNum, expTexto
@@ -90,23 +118,9 @@ function analisaExpNovoArray (exp, ambiente)
 			if v.tipo.basico ~= TipoBasico.inteiro then
 				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", v.linha)
 			end
-			if v.tipo.tag == TipoTag.array then -- verificar dimensoes do array
-				local n = 0
-				if v.tag == Tag.expNovoArray then
-					n = 1	
-				else -- eh variavel
-					local ref = tabsim.procuraSimbolo(v, ambiente)
-					if ref then
-						n = ref.tipo.dim
-					end
-					if v.dim then
-						n = n - v.dim
-					end
-				end
-				if n ~= 0 then
-					erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", v.linha)
-				end 
-			end
+			if not ehValorBasico(v, ambiente) then
+				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", v.linha)
+			end 
 		else
 			--print("cabou analisaExpNovoArray")
 			break
@@ -127,35 +141,7 @@ function analisaExpOpBin (exp, ambiente)
 		return
 	end
 
-	local n1, n2 = 0, 0
-	if p1.tipo.tag == TipoTag.array then
-		if p1.tag == Tag.expNovoArray then
-			n1 = 1	
-		else -- eh variavel
-			local v1 = tabsim.procuraSimbolo(p1, ambiente)
-			if v1 then
-				n1 = v1.tipo.dim
-			end
-			if p1.dim then
-				n1 = n1 - p1.dim
-			end
-		end
-	end
-	if p2.tipo.tag == TipoTag.array then
-		if p2.tag == Tag.expNovoArray then
-			n2 = 1	
-		else -- eh variavel
-			local v2 = tabsim.procuraSimbolo(p2, ambiente)
-			if v2 then
-				n2 = v2.tipo.dim
-			end	
-			if p2.dim then
-				n2 = n2 - p2.dim
-			end
-		end
-	end
-		
-	if n1 ~= 0 or n2 ~= 0 then 
+	if not ehValorBasico(p1, ambiente) or not ehValorBasico(p2, ambiente) then 
 		erro("operandos inválidos para o operador binário '" .. exp.op.s .. "'", p1.linha)
 	end
 end
@@ -258,11 +244,6 @@ local function analisaAtrib (var, exp, ambiente)
 			idx = #var.t
 		end
 		if exp.tag == Tag.expNovoArray then
-			--if var.tipo.basico ~= exp.tipo.basico then
-				--local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico .. " à variável "
-    		--s = s .. "'" .. var.v .. "' do tipo " .. var.tipo.basico
-				--erro(s, var.linha)
-			--end
 			if exp.dim > var.tipo.dim - idx then
 				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 			end
@@ -292,55 +273,9 @@ local function analisaDecVar (decVar, ambiente)
 end
 
 
-local function ehTamArrayValido (exp)
-	if exp.tag == Tag.expInt then
-		return true
-	elseif exp.tag == Tag.expSimpVar then --TODO: mudar depois pra aceitar variaveis inicializadas
-		return false
-	elseif exp.tag == Tag.expOpNum then
-		return ehTamArrayValido(exp.p1) and ehTamArrayValido(exp.p2)
-	else
-		return false
-	end
-end
-
-
-local function analisaDecArrayVar (decArrayVar, ambiente)
-	--print("chamei analisaDecArrayVar")
-	--analisaExp(decArrayVar.tam, ambiente)
-	
-	--if tipo.naoTipado(decArrayVar.tam.tipo) then
-	--	return
-	--end	
-
-	--print("DecArrayVar ", decArrayVar.tam.tipo.basico)
-	--print("compat", tipo.tiposCompativeis(decArrayVar.tam.tipo.basico, TipoBasico.inteiro))
-	-- TODO: ver onde uso tiposCompativeis e onde quero o próprio tipo
-	--if not (decArrayVar.tam.tipo.basico == TipoBasico.inteiro) then
-		--local s = "tamanho do array deve ser uma expressão do tipo inteiro"
-		--erro(s, decArrayVar.tam.linha)
-	--elseif not ehTamArrayValido(decArrayVar.tam) then
-			--local s = "tamanho do array deve poder ser determinado em tempo de compilação"
-	--		local s = "expressão que define o tamanho do array deve ser constantepoder ser determinado em tempo de compilação"
-	--		erro(s, decArrayVar.tam.linha)
-	--end
-
-	--if decArrayVar.exp then  TODO: permitir inicializar o array na declaração
-		--analisaTipoAtrib(decArrayVar.v, decArrayVar.exp, ambiente)
-	--end
-	tabsim.insereSimbolo(decArrayVar, ambiente, true)
-end
-
-
 local function analisaDecVarLista (listaDec, ambiente)
 	for i, v in ipairs(listaDec) do
-		--if v.tag == Tag.decArrayVar then
-			--print("DecArrayVAR")
-			--analisaDecArrayVar(v, ambiente)
-		--else
-			--print("DecVar vai")
-			analisaDecVar(v, ambiente, true)
-		--end
+		analisaDecVar(v, ambiente)
 	end
 end
 
@@ -381,7 +316,7 @@ local function analisaCmdRepita (c, ambiente)
 	analisaBloco(c.bloco, ambiente)
 end
 
-function analisaCmdChamada (c, ambiente)
+local function analisaCmdChamada (c, ambiente)
 	if c.nome.v == "saida" then
 		for i, v in ipairs(c.args) do
 			analisaExp(v, ambiente)

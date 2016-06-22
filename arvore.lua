@@ -357,7 +357,6 @@ return {
 	noOpNumExp = noOpNumExp,
 	noOpCompExp = noOpCompExp,
 	noOpBoolExp = noOpBoolExp,
-	noArrayExp = noArrayExp,
 	noNovoArrayExp = noNovoArrayExp,
 	noCmdAtrib = noCmdAtrib,
 	noCmdRepita = noCmdRepita,

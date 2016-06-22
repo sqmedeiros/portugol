@@ -77,7 +77,6 @@ local predef = { ["countLine"] = countLine,
 								 ["noDecVar"] = arvore.noDecVar,
 								 ["noDecArrayVar"] = arvore.noDecArrayVar,
 								 ["noBloco"] = arvore.noBloco,
-								 ["noArrayExp"] = arvore.noArrayExp, -- TODO: ver se precisa 
 								 ["noNovoArrayExp"] = arvore.noNovoArrayExp,
 								 ["noTipo"] = arvore.noTipo,	
 								 ["noVar"] = arvore.noVar	
