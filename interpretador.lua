@@ -99,16 +99,18 @@ function avaliaNovoArrayExp (exp, ambiente)
 end
 
 function getVarArrayRef (v, i, t, ambiente)
-	print("arrayRef", v, i, t)
+	--print("arrayRef", v, i, t)
 	if t == nil then
 		return v
 	end
 
 	x = avalia(t[i], ambiente)	
-	print("ref21 ", v, x, v[x], #t, t[i], v.array, v.n)
-	print("ref2 ",  v.array[x])
+	--print("ref21 ", v, x, v[x], #t, t[i], v.array, v.n, v.v)
+	--print("ref2 ",  v.array[x])
 
-	if x > v.n then
+	if v.n == nil then
+		error("Erro: array não inicializado")
+	elseif x > v.n then
 		error("Erro: acesso a índice inválido " .. x .. " do array")
 	end
 
@@ -122,9 +124,10 @@ end
 local function decArrayVar (v, ambiente)
 	local nexp, t
 	if v.exp then
-		local nexp, t = avaliaNovoArrayExp(v.exp, ambiente)
+		nexp, t = avaliaNovoArrayExp(v.exp, ambiente)
+		--print("nexp, t", nexp, t)
 	end
-	--print("decArrayVar", v, v.v, v.tipo, v.tipo.tag, v.tipo.dim)
+	--print("decArrayVar", v, v.v, v.tipo, v.tipo.tag, v.tipo.dim, v.exp, nexp, t)
 	tab.insereSimbolo(v, nexp, ambiente, v.tipo.dim, t)	
 end
 
@@ -156,12 +159,11 @@ function execChamada (c, ambiente)
 				end
 				
 			until  true == true --x ~= nil
-			local idx
-			--if c.p1.tag == Tag.expArray then -- TODO: talvez criar outra tag
-			--	idx = avalia(c.p1.exp, ambiente)
-			--end
-			v = tab.getValor(v, ambiente)
-			tab.setValor(v, x) 
+			local ref = tab.getValor(v, ambiente)
+			if v.tipo.tag == TipoTag.array then
+				ref = getVarArrayRef(ref, 1, v.t, ambiente)
+			end
+			tab.setValor(ref, x)
 		end
 	else
 		error("Função inválida")
@@ -215,9 +217,9 @@ local function execCmdAtrib (c, ambiente)
 	local var = c.p1
 	local ref = tab.getValor(var, ambiente)
 	if var.tipo.tag == TipoTag.array then
-		print("vou pegar ref", var.v, var.dim, ref, ref.array, ref.v)
+		--print("vou pegar ref", var.v, var.dim, ref, ref.array, ref.v)
 		if var.t ~= nil then
-			print("embaixo", var.t, #var.t, var.linha)
+			--print("embaixo", var.t, #var.t, var.linha)
 		end
 		ref = getVarArrayRef(ref, 1, var.t, ambiente)
 		--ref.tipo = {}
@@ -232,11 +234,11 @@ local function execCmdAtrib (c, ambiente)
 		local nexp, t = avalia(c.p2, ambiente)
 		ref.tipo = {}
 		--ref.tipo.dim = var.tipo.dim 	
-		print("cmdAtrib", ref, ref.array, ref.v, nexp, t, t[1], ref.tipo, ref.tipo.dim)
+		--print("cmdAtrib", ref, ref.array, ref.v, nexp, t, t[1], ref.tipo, ref.tipo.dim)
 		tab.setValor(ref, t, nexp)
 	else
 		local v = avalia(c.p2, ambiente)
-		print("eu", v, c.p2, c.p2.tag)
+		--print("eu", v, c.p2, c.p2.tag)
 		tab.setValor(ref, v)
 	end
 end

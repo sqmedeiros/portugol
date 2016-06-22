@@ -11,7 +11,10 @@ local function isValid (f)
 	if string.match(f, "[.]swp") then
 		return false
 	end
-	return true
+	if string.sub(f, #f-3) == ".por" then
+		return true
+	end
+	return false
 end
 
 local function readFile (name)
@@ -24,14 +27,45 @@ local function readFile (name)
 	return s
 end
 
-local dir = "./test/semNo"
+local function equalString (s1, s2)
+	s1 = string.gsub(s1, "[ \t]", "")
+	s2 = string.gsub(s2, "[ \t]", "")
+	return s1 == s2
+end
+
 local arqTeste = {}
 
 local function novoTeste (nomeArq, nerro)
 	table.insert(arqTeste, { nome = nomeArq, nerro = nerro })
 end
 
-function makeTeste (arquivos)
+function execFile (nome, dir)
+	--executa arquivo portugol
+	local nome = string.sub(nome, 1, #nome - 4)
+	local prefixo = dir .. "/" .. nome
+	local cmd = "lua main2.lua " .. prefixo .. ".por"
+	local inCmd = ""
+	if io.open(prefixo .. ".in") then -- arquivo de entrada associado
+		inCmd = " < " .. prefixo .. ".in "
+	end
+	cmd = cmd .. inCmd.. " > " .. prefixo .. ".out"
+	os.execute(cmd)
+	
+	--executa arquivo Lua equivalente
+	local cmd2 = "lua " .. prefixo .. ".lua" .. inCmd .. " > " .. prefixo .. ".out2"
+	os.execute(cmd2)
+
+	local s1 = prefixo .. ".out"
+	local f1 = readFile(s1)
+
+	local s2 = prefixo .. ".out2"
+	local f2 = readFile(s2)
+	if not equalString(f1, f2) then
+		error("Erro: arquivos de saída diferentes " .. nome)
+	end
+end
+
+function makeTeste (arquivos, dir)
 	for i, v in ipairs(arqTeste) do
 		print(v.nome, v.nerro)
 		local s = readFile(dir .. "/" .. v.nome)
@@ -45,6 +79,9 @@ function makeTeste (arquivos)
 		for _, e in ipairs(terro) do
 	  	print(e)
 		end 
+		if #terro == 0 then
+			execFile(v.nome, dir)
+		end
 	end
 end
 
@@ -66,7 +103,8 @@ novoTeste("erroPrecOpNao.por", 4) -- antes era 2, mas acho que 4 faz mais sentid
 novoTeste("erroArrayDec.por", 4)
 novoTeste("erroArray1.por", 6)
 
-makeTeste(arqTeste)
+local dir = "./test/semNo"
+makeTeste(arqTeste, dir)
 print("OK")
 
 dir = "./test/semYes"
@@ -77,7 +115,18 @@ for file in lfs.dir(dir) do
 	end
 end
 
-
-makeTeste(arqTeste)
+makeTeste(arqTeste, dir)
 print("OK Yes")
+
+
+dir = "./test/semYesArray"
+arqTeste = {}
+for file in lfs.dir(dir) do
+	if isValid(file) then
+		novoTeste(file, 0)
+	end
+end
+
+makeTeste(arqTeste, dir)
+print("OK YesArray")
 

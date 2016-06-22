@@ -24,30 +24,13 @@ local function saiBloco (ambiente)
 	table.remove(ambiente)	
 end
 
-local function insereSimbolo (var, valor, ambiente, dim, t)
-	local n = #ambiente
-	local dim = var.tipo.dim
-	local nome = var.v
-	if var.tag == Tag.decArrayVar then
-		local nome = var.v
-		--print("INSERE ", var.tipo, var.v, var.tipo.tag, var.tipo.basico)
-		ambiente[n][nome] = { dim = dim, tipo = var.tipo }
-		if valor then
-			inicializaNovoArray(ambiente[n][nome], valor, t, 1)
-		end
-	else
-		local nome = var.v
-		ambiente[n][nome] = { v = valor, tipo = var.tipo }
-	end
-end
-
 local function inicializaNovoArray (var, nexp, t, i)
 	if i > nexp then
 		return
 	else
 		var.array = {}
 		var.n = t[i]
-		print("Inicializa i = ", i, #t, t[i], nexp)
+		--print("Inicializa i = ", var, var.array, i, #t, t[i], nexp)
 		if i < #t then
 			for j = 1, var.n do
 				var.array[j] = {}
@@ -59,6 +42,23 @@ local function inicializaNovoArray (var, nexp, t, i)
 				var.array[j] = {}
 			end
 		end
+	end
+end
+
+local function insereSimbolo (var, valor, ambiente, dim, t)
+	local n = #ambiente
+	local dim = var.tipo.dim
+	local nome = var.v
+	if var.tag == Tag.decArrayVar then
+		local nome = var.v
+		--print("INSERE ", var.tipo, var.v, var.tipo.tag, var.tipo.basico, valor, t)
+		ambiente[n][nome] = { dim = dim, tipo = var.tipo }
+		if valor then
+			inicializaNovoArray(ambiente[n][nome], valor, t, 1)
+		end
+	else
+		local nome = var.v
+		ambiente[n][nome] = { v = valor, tipo = var.tipo }
 	end
 end
 
@@ -78,22 +78,19 @@ local function getValor (exp, ambiente)
 	return nil	
 end
 
-local function getValorArray (var, ambiente, idx)
-	local t = 1 
-end
 
 local function setValor (var, valor, nexp)
-	print("setValor ", var, var.v, var.array, valor, nexp)
+	--print("setValor ", var, var.v, var.array, valor, nexp)
 	if type(valor) == "table" then
-		print("vloar2", valor.array, valor.v)
+		--print("vloar2", valor.array, valor.v)
 	end
 
 	if nexp ~= nil then  -- novo array
 		--print("INSERE setValor ", var.tipo.basico, valor[1])
-		print("INSERE", var, var.tag, var.v, var.array)
+		--print("INSERE", var, var.tag, var.v, var.array)
 		inicializaNovoArray(var, nexp, valor, 1)
 	elseif type(valor) == "table" then
-			print("setArray", var.array, valor, valor.array)
+			--print("setArray", var.array, valor, valor.array)
 			var.array = valor.array
 			var.n = valor.n
 	else
