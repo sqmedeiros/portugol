@@ -22,10 +22,10 @@ newError("erroExpPar", "expressão esperada após '('")
 newError("erroExpVirg", "expressão esperada após ','")
 newError("erroExpArray", "expressão esperada após '['")
 newError("erroExp", "expressão mal formada")
-newError("erroDecNome", "nome esperado após ','")
+newError("erroDecNome", "nome esperado após ',' ou declaração de tipo")
 newError("erroFim", "'fim' esperado no final do comando")
 newError("erroEnquanto", "'enquanto' esperado após 'repita'")
-newError("erroAtrib", "'=' esperado")
+newError("erroAtrib", "'=' esperado após variável")
 newError("erroTipo", "nome de tipo esperado após 'novo'")
 newError("erroFuncPredef", "'(' esperado após o nome da função")
 newError("erroFechaPar", "caractere ')' esperado")
@@ -87,7 +87,6 @@ predef["getTipoBasico"] = defs.getTipoBasico
 
 re.setlabels(labelCode)
 
--- TODO: ajustar mensagem de erro no primeiro "Nome" em DecVarAtrib
 
 local g = re.compile([[
   Programa     <- Sp Bloco (!. / ErroIndefinido)
@@ -195,9 +194,18 @@ local g = re.compile([[
 ]], predef)
 
 
-local function imprimeErro(n, e)
+local function imprimeErro(n, e, serror)
 	assert(n == nil)
-	print("(Erro) Perto da linha " .. defs.linha .. ": " .. terror[e].msg)
+	local j = string.find(serror, "\n")
+	if j ~= nil then
+		j = j - 1
+	end
+	local s = string.sub(serror, 1, j)
+	if terror[e].msg == "indefinido" then
+		print('(Erro) Perto da linha ' .. defs.linha .. ' ao tentar reconhecer "' .. s .. '"')
+	else
+		print('(Erro) Perto da linha ' .. defs.linha .. ': ' .. terror[e].msg)
+	end
 end
 
 local function parse(s)
@@ -206,9 +214,9 @@ local function parse(s)
 end
 
 local function parse2(s)
-  local t, v = parse(s)
+  local t, v, serror = parse(s)
 	if not t then
-		imprimeErro(t, v)
+		imprimeErro(t, v, serror)
 	end
 	return t
 end
@@ -247,9 +255,9 @@ local function compila (arqEntrada, arqSaida)
 end
 
 local function interpreta (arqEntrada)
-	local t, v = teste(arqEntrada)
+	local t, v, serror = teste(arqEntrada)
 	if not t then
-		imprimeErro(t, v)
+		imprimeErro(t, v, serror)
 	else
   	semantica.analisaPrograma(t)
 		local terro = erro.getErros()
