@@ -252,7 +252,7 @@ end
 
 local function noCmdChamada (t)
 	t.tag = Tag.cmdChamada
-	t.tipo = makeTipo(TipoTag.simples, TipoBasico.vazio)
+	--t.tipo = makeTipo(TipoTag.simples, TipoBasico.vazio)
 	return t
 end
 
@@ -370,5 +370,6 @@ return {
 	noBloco = noBloco,
 	imprimeArvore = imprimeArvore,
 	ehComando = ehComando,
-	ehExpressao = ehExpressao
+	ehExpressao = ehExpressao,
+	makeTipo = makeTipo
 }

@@ -1,11 +1,12 @@
 local defs = require 'defs'
 local tab = require 'tabinterpretador'
+local unpack = table.unpack or unpack
 
 local TipoTag = defs.TipoTag
 local TipoBasico = defs.TipoBasico
 local Tag = defs.Tag
 
-local avaliaNovoArrayExp
+local avaliaNovoArrayExp, avaliaExpChamada
 local getVarArrayRef
 
 local function avalia (exp, ambiente)
@@ -79,6 +80,8 @@ local function avalia (exp, ambiente)
 		local res = getVarArrayRef(var, 1, exp.t, ambiente)
 		--print("arrayVar2 res = ", res, res.v)
 		return res.v  --TODO: ver o caso de "res" ser um array
+	elseif exp.tag == Tag.expChamada then
+		return avaliaExpChamada(exp, ambiente)
 	else
 		error("Expressao desconhecida3 " .. exp.tag)
 	end
@@ -96,6 +99,57 @@ function avaliaNovoArrayExp (exp, ambiente)
 	end
 
 	return exp.nexp, res
+end
+
+function avaliaExpChamada (exp, ambiente)
+	if exp.nome.v == "saida" then
+		for i, v in ipairs(exp.args) do
+			local e1 = avalia(v, ambiente)
+			io.write(tostring(e1), " ")
+		end
+		io.write("\n")
+	elseif exp.nome.v == "entrada" then
+		for i, v in ipairs(exp.args) do
+			local x
+			repeat
+				--print("vartipo", v.tipo, v.v, v.tag)
+				if v.tipo.basico == TipoBasico.inteiro or v.tipo.basico == TipoBasico.numero then
+					x = io.read("*n")
+					x = tonumber(x)
+				else
+					x = io.read()
+				end
+			until  true == true --x ~= nil
+			local ref = tab.getValor(v, ambiente)
+			if v.tipo.tag == TipoTag.array then
+				ref = getVarArrayRef(ref, 1, v.t, ambiente)
+			end
+			tab.setValor(ref, x)
+		end
+	elseif exp.nome.v == "textoComp" then
+		local v = exp.args[1]
+		local s = avalia(v, ambiente)
+		if s == nil then
+			error("Variável " .. v.v .. " não foi inicializada")
+		end
+		return #s
+	elseif exp.nome.v == "textoSub" then
+		local t = {}
+		for i, v in ipairs(exp.args) do
+			local s = avalia(v, ambiente)
+			if s == nil then
+				error("Variável " .. v.v .. " não foi inicializada")
+			end
+			t[#t + 1] = s
+		end
+		return string.sub(unpack(t))
+	elseif exp.nome.v == "textoPos" then
+		exp.nome.v = "textoSub"
+		exp.args[3] = exp.args[2]
+		return avaliaExpChamada(exp, ambiente)
+	else
+		error("Função inválida")
+	end			
 end
 
 function getVarArrayRef (v, i, t, ambiente)
@@ -140,34 +194,7 @@ local function decVar (v, ambiente)
 end
 
 function execChamada (c, ambiente)
-	if c.nome.v == "saida" then
-		for i, v in ipairs(c.args) do
-			local exp = avalia(v, ambiente)
-			io.write(tostring(exp), " ")
-		end
-		io.write("\n")
-	elseif c.nome.v == "entrada" then
-		for i, v in ipairs(c.args) do
-			local x
-			repeat
-				--print("vartipo", v.tipo, v.v, v.tag)
-				if v.tipo.basico == TipoBasico.inteiro or v.tipo.basico == TipoBasico.numero then
-					x = io.read("*n")
-					x = tonumber(x)
-				else
-					x = io.read()
-				end
-				
-			until  true == true --x ~= nil
-			local ref = tab.getValor(v, ambiente)
-			if v.tipo.tag == TipoTag.array then
-				ref = getVarArrayRef(ref, 1, v.t, ambiente)
-			end
-			tab.setValor(ref, x)
-		end
-	else
-		error("Função inválida")
-	end
+	avaliaExpChamada(c, ambiente)
 end
 
 local function decVarLista (dec, ambiente)

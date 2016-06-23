@@ -114,8 +114,8 @@ local g = re.compile([[
                                               (ABRECOL (Exp / '' -> 'nil') (FECHACOL / ErroFechaCol))*) -> noNovoArrayExp   / 
                   ABREPAR  (Exp / ErroExpPar)  (FECHAPAR / ErroFechaPar)  /
                   ChamadaFunc / Numero  / Var  / Cadeia / VERDADEIRO / FALSO
-  ChamadaFunc  <- ((FuncPredef / Nome ABREPAR) ListaExp (FECHAPAR / ErroFechaPar)) -> noChamadaFunc
-  FuncPredef   <- (ENTRADA / SAIDA) -> noId (ABREPAR / ErroFuncPredef)
+  ChamadaFunc  <- ((FuncPredef -> noId (ABREPAR / ErroFuncPredef) / Nome ABREPAR) ListaExp (FECHAPAR / ErroFechaPar)) -> noChamadaFunc
+  FuncPredef   <- ENTRADA / SAIDA / TEXTOCOMP / TEXTOSUB / TEXTOPOS
   ListaExp     <- (Exp (VIRG (Exp / ErroExpVirg))*)*
   Var          <- (Nome (ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol))*) -> noVar
   Nome         <- !RESERVADA {LETRA RestoNome*} -> noId Sp
@@ -129,17 +129,20 @@ local g = re.compile([[
   Cadeia       <- '"' (!'"' .)* -> noTexto '"' Sp
   Tipo         <- (TipoBase ({ABRECOL FECHACOL})*) -> noTipo
   TipoBase     <- INTEIRO / NUMERO / TEXTO / BOOLEANO
-	RESERVADA    <- SE / SENAOSE / SENAO / FIM / ENTRADA / REPITA / ENQUANTO / SAIDA /
+	RESERVADA    <- SE / SENAOSE / SENAO / FIM / REPITA / ENQUANTO /
                   INTEIRO / NUMERO / TEXTO / BOOLEANO / FALSO / VERDADEIRO / MOD /
-                  E / OU / NAOIGUAL / NAO / NOVO
+                  E / OU / NAOIGUAL / NAO / NOVO / FuncPredef
   SE           <- 'se' FimNome
   SENAOSE      <- 'senaose' FimNome
   SENAO        <- 'senao' FimNome
   FIM          <- 'fim' FimNome
   ENTRADA      <- {'entrada'} FimNome
+  SAIDA        <- {'saida'} FimNome
+  TEXTOCOMP    <- {'textoComp'} FimNome
+  TEXTOSUB     <- {'textoSub'} FimNome
+  TEXTOPOS     <- {'textoPos'} FimNome
   REPITA       <- 'repita' FimNome
   ENQUANTO     <- 'enquanto' FimNome
-  SAIDA        <- {'saida'} FimNome
   INTEIRO      <- 'inteiro' -> getTipoBasico FimNome
   NUMERO       <- 'numero' -> getTipoBasico FimNome 
   TEXTO        <- 'texto' -> getTipoBasico FimNome

@@ -103,6 +103,9 @@ novoTeste("erroPrecOpNao.por", 4) -- antes era 2, mas acho que 4 faz mais sentid
 novoTeste("erroArrayDec.por", 7)
 novoTeste("erroArray1.por", 6)
 novoTeste("erroArrayOpBin.por", 9)
+novoTeste("erroTextoComp.por", 5)
+novoTeste("erroTextoSub.por", 10)
+novoTeste("erroTextoPos.por", 8)
 
 local dir = "./test/semNo"
 makeTeste(arqTeste, dir)

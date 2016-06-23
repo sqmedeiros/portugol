@@ -13,6 +13,7 @@ local Tag = defs.Tag
 local analisaBloco, analisaExpNao
 local analisaExpSimpVar, analisaExpArrayVar, analisaExpNovoArray
 local analisaExpOpBin, analisaExpOpNum, analisaExpOpComp, analisaExpOpBool 
+local analisaExpChamada, analisaListaArg
 
 -- 0 significa um valor basico
 -- 1 significa um valor de uma dimensao, etc
@@ -67,7 +68,7 @@ local function analisaExp (exp, ambiente)
 	elseif tag == Tag.expNovoArray then
 		analisaExpNovoArray(exp, ambiente)
 	elseif tag == Tag.expChamada then
-		error("Falta analisar chamada de função")
+		analisaExpChamada(exp, ambiente)
 	else
 		error("Expressão desconhecida " .. exp.tag)	
 	end
@@ -219,6 +220,69 @@ function analisaExpOpBool (exp, ambiente)
 	end
 end
 
+function analisaExpChamada (exp, ambiente)
+	if exp.nome.v == "saida" then
+		for i, v in ipairs(exp.args) do
+			analisaExp(v, ambiente)
+		end
+		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.vazio)	
+	elseif exp.nome.v == "entrada" then
+		for i, v in ipairs(exp.args) do
+			analisaExp(v, ambiente)
+		end	
+		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.vazio)	
+	elseif exp.nome.v == "textoComp" then
+		if #exp.args ~= 1 then
+			erro("função textoComp espera 1 parâmetro, mas foi chamada com " .. #exp.args, exp.nome.linha)
+			return
+		end
+		local v1 = exp.args[1]	
+		analisaExp(v1, ambiente)
+		if v1.tipo.basico ~= TipoBasico.texto or not ehValorBasico(v1, ambiente) then
+			erro("função textoComp espera parâmetro do tipo 'texto'", v1.linha)
+		end
+		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.inteiro)
+	elseif exp.nome.v == "textoSub" or exp.nome.v == "textoPos" then
+		local nome = exp.nome.v
+		local n = #exp.args
+		if n < 2 or n > 3 or (n == 3 and nome ~= "textoSub") then
+			erro("função " .. nome .. " espera 2 ou 3 parâmetros, mas foi chamada com " .. #exp.args, exp.nome.linha)
+			return
+		end
+		local v1 = exp.args[1]	
+		analisaExp(v1, ambiente)
+		if v1.tipo.basico ~= TipoBasico.texto or not ehValorBasico(v1, ambiente) then
+			erro("função " .. nome .. " espera primeiro parâmetro do tipo 'texto'", v1.linha)
+		end
+
+		for i = 2, #exp.args do
+			local v = exp.args[i]
+			analisaExp(v, ambiente)
+			if v.tipo.basico ~= TipoBasico.inteiro or not ehValorBasico(v, ambiente) then
+				erro("função " .. nome .. " espera " .. i .. "o parâmetro do tipo 'inteiro'", v.linha)
+			end
+		end	
+		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.texto)
+	else
+		error("Função inválida: " .. exp.nome.v)
+	end
+end
+
+function analisaListaArg(arg, param, ambiente)
+	local narg = #arg
+	local nparam = #nparam
+	if narg ~= nparam then
+		erro("função espera " .. nparam .. " parâmetros(s), mas foi chamada com " .. narg, arg.linha)
+		return
+	end
+	for i, v in ipairs(arg) do
+		analisaExp(v, ambiente)
+		if not tipo.tiposCompativeis(v.tipo.basico, param[i].tipo.basico) then
+			erro("parâmetro ", v.linha)
+		end
+	end
+end
+
 
 local function analisaAtrib (var, exp, ambiente)
 	if var.tag == Tag.expArrayVar then
@@ -317,17 +381,7 @@ local function analisaCmdRepita (c, ambiente)
 end
 
 local function analisaCmdChamada (c, ambiente)
-	if c.nome.v == "saida" then
-		for i, v in ipairs(c.args) do
-			analisaExp(v, ambiente)
-		end	
-	elseif c.nome.v == "entrada" then
-		for i, v in ipairs(c.args) do
-			analisaExp(v, ambiente)
-		end	
-	else
-		error("Função inválida")
-	end
+	analisaExpChamada(c, ambiente)
 end
 
 local function analisaComando (c, ambiente)
