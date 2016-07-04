@@ -1,9 +1,9 @@
 texto s1, s2
 
-saida("Digite uma palava: ")
-entrada(s1)
-saida("Digite outra palavra: ")
-entrada(s2)
+escreva("Digite uma palava: ")
+leia(s1)
+escreva("Digite outra palavra: ")
+leia(s2)
 
 texto s3 = ""
 
@@ -23,4 +23,4 @@ repita enquanto i <= textoComp(s2)
 	i = i + 1
 fim
 
-saida(s1, s2, s3)
+escreva(s1, s2, s3)

@@ -1,14 +1,14 @@
 texto[] palavra
 inteiro n
 
-entrada(n)
+leia(n)
 texto aux
-entrada(aux)
+leia(aux)
 
 palavra = novo texto[n]
 inteiro i = 1
 repita enquanto i <= n
-	entrada(palavra[i])
+	leia(palavra[i])
 	i = i + 1
 fim
 
@@ -28,7 +28,7 @@ fim
 
 i = 1
 repita enquanto i <= n
-	saida(palavra[i])
+	escreva(palavra[i])
 	i = i + 1
 fim
 

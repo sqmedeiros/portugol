@@ -7,7 +7,7 @@ repita enquanto i <= 26
 	i = i + 1
 fim*/ 
 
-entrada(linha)
+leia(linha)
 
 inteiro i = 1
 inteiro letra = 0
@@ -19,4 +19,4 @@ repita enquanto i <= textoComp(linha)
 	i = i + 1
 fim 
 
-saida("Letras = ", letra)
+escreva("Letras = ", letra)
