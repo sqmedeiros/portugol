@@ -44,6 +44,8 @@ local function temTipo (t)
 	assert(t.tag ~= TipoTag.naotipado and t.basico ~= TipoBasico.naotipado)
 end
 
+
+-- Posso usar o tipo t2 no lugar de t1?
 function tiposCompativeis (t1, t2, atrib) -- t1 e t2 são tipos básicos
 	if t1  == t2 then
 		return true

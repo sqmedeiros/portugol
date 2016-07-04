@@ -56,6 +56,8 @@ local function insereSimbolo (var, valor, ambiente, dim, t)
 		if valor then
 			inicializaNovoArray(ambiente[n][nome], valor, t, 1)
 		end
+	elseif var.tag == Tag.decFuncao then
+		error("Inserindo funcao")	
 	else
 		local nome = var.v
 		ambiente[n][nome] = { v = valor, tipo = var.tipo }

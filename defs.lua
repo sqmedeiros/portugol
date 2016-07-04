@@ -30,7 +30,7 @@ local TipoTag = { array = {}, simples = {}, naotipado = {} }
 
 local TipoBasico = { naotipado = {}, bool = {}, inteiro = {}, numero = {}, texto = {}, vazio = {} }
 
-local Tag = { decVar = {}, decArrayVar = {}, decVarLista = {}, bloco = {},
+local Tag = { decVar = {}, decFuncao = {}, decArrayVar = {}, decVarLista = {}, bloco = {},
               cmdAtrib = {}, cmdRepita = {}, cmdSe = {}, cmdSenaoSe = {},
               blocoSenaoSe = {},
               expBool = {}, expInt = {}, expNum = {}, expTexto = {}, expNovoArray = {},

@@ -13,7 +13,7 @@ local Tag = defs.Tag
 local analisaBloco, analisaExpNao
 local analisaExpSimpVar, analisaExpArrayVar, analisaExpNovoArray
 local analisaExpOpBin, analisaExpOpNum, analisaExpOpComp, analisaExpOpBool 
-local analisaExpChamada, analisaListaArg
+local analisaExpChamada, analisaListaArg, analisaAtrib
 
 -- 0 significa um valor basico
 -- 1 significa um valor de uma dimensao, etc
@@ -235,6 +235,34 @@ function analisaExpOpBool (exp, ambiente)
 	end
 end
 
+function analisaParametrosFunc (func, exp, ambiente)
+	local n1 = #func.params.lista
+	local n2 = #exp.args
+	if n1 ~= n2 then
+		erro("função '" .. func.nome .. "' espera " .. n1 .. " parâmetro(s), mas foi chamada com " .. n2, exp.linha)
+	end
+	
+	for i, v in ipairs(exp.args) do
+		analisaExp(v, ambiente)
+		local x = func.params.lista[i]
+		print(x.tipo.basico, v.tipo.basico, tiposCompativeis(v.tipo, x.tipo))
+		analisaAtrib(x, v, ambiente) 
+	end
+end
+
+function analisaExpChamadaAux (exp, ambiente)
+	local ref = tabsim.procuraSimbolo(exp.nome, ambiente)
+	if not ref.params then -- eh funcao?
+		erro("função '" .. exp.nome.v .. "' não declarada", exp.linha)
+		return
+	end
+
+	analisaParametrosFunc(ref, exp, ambiente)	
+	exp.tipo = ref.tipo
+	print("exp.tipo = ", exp.tipo.basico)
+
+end
+
 function analisaExpChamada (exp, ambiente)
 	if exp.nome.v == "escreva" then
 		for i, v in ipairs(exp.args) do
@@ -279,7 +307,7 @@ function analisaExpChamada (exp, ambiente)
 		end	
 		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.texto)
 	else
-		error("Função inválida: " .. exp.nome.v)
+		analisaExpChamadaAux(exp, ambiente)
 	end
 end
 
@@ -299,7 +327,7 @@ function analisaListaArg(arg, param, ambiente)
 end
 
 
-local function analisaAtrib (var, exp, ambiente)
+function analisaAtrib (var, exp, ambiente)
 	if var.tag == Tag.expArrayVar then
 		analisaExpArrayVar(var, ambiente)
 	end	
@@ -314,24 +342,24 @@ local function analisaAtrib (var, exp, ambiente)
 	if not tipo.tiposCompativeis(var.tipo.basico, exp.tipo.basico, true) then
 		local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico .. " à variável "
     s = s .. "'" .. var.v .. "' do tipo " .. var.tipo.basico
-		erro(s, var.linha)
+		erro(s, exp.linha)
 	elseif exp.tag == Tag.expNovoArray and var.tipo.tag ~= TipoTag.array then
-			erro("variável " .. var.v .. " não é um array", exp.linha)
+			erro("variável '" .. var.v .. "' não é um array", exp.linha)
 	elseif var.tipo.tag == TipoTag.array then
 		local nvar = getVarDim(var, ambiente)
 		if exp.tag == Tag.expNovoArray then
 			if exp.dim > nvar then
-				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", exp.linha)
 			end
 		elseif exp.tipo.tag == TipoTag.array then
 			local nexp = getVarDim(exp, ambiente)
 			if nvar ~= nexp then
-				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", exp.linha)
 			elseif nvar > 0 and var.tipo.basico ~= exp.tipo.basico then
-				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", exp.linha)
 			end
 		elseif nvar > 0 then
-			erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
+			erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", exp.linha)
 		end
 	end
 end
@@ -418,18 +446,35 @@ local function analisaComando (c, ambiente)
 	end
 end
 
-function analisaBloco (bloco, ambiente)
+function analisaDecFuncao (decFun, ambiente)
+	tabsim.insereSimbolo(decFun.v, ambiente, decFun.params)
 	tabsim.entraBloco(ambiente)
+	for i, v in ipairs(decFun.params.lista) do
+		print(i, v, v.v)
+		analisaDecVar(v, ambiente)
+	end
+	analisaBloco(decFun.tbloco, ambiente, true)	
+	tabsim.saiBloco(ambiente)
+end
+
+function analisaBloco (bloco, ambiente, externo)
+	if not externo then
+		tabsim.entraBloco(ambiente)
+	end
 	for i, v in ipairs(bloco.tbloco) do	
 		if v.tag == Tag.decVarLista then
 			analisaDecVarLista(v.lista, ambiente)
 		elseif arvore.ehComando(v) then
 			analisaComando(v, ambiente)
+		elseif v.tag == Tag.decFuncao then
+			analisaDecFuncao(v, ambiente)
 		else
-			erro("Tag inválida: " .. tostring(v.tag), bloco.linha)
+			error("Tag inválida: " .. tostring(v.tag), bloco.linha)
 		end
 	end
-	tabsim.saiBloco(ambiente)	
+	if not externo then
+		tabsim.saiBloco(ambiente)	
+	end
 end
 
 local function analisaPrograma (t)

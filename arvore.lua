@@ -14,6 +14,7 @@ local function msgLinha (l)
 	return "linha = " .. l
 end
 
+-- TODO: atualizar a função
 local function imprimeArvore (t, tab, n)
 	tab = tab or 0
   n = n or 2
@@ -78,6 +79,8 @@ local function imprimeArvore (t, tab, n)
 	elseif t.tag == Tag.expNao then
 		print(t.tag, t.tipo, msgLinha(t.linha))
 		imprimeArvore(t.exp)
+	elseif t.tag == Tag.decFuncao then
+		print(t.tag, t.v)
 	else
     print(t, t.tag, type(t), t.p1, t.p2, t == "")
 		assert(0 == 1, "Falta tratar", t)
@@ -302,6 +305,14 @@ local function noDecVar (v, e)
            v = v.v, exp = e, linha = v.linha }
 end
 
+local function noDecFuncao (nome, params, tipo, bloco)
+	print("noDecFunc", nome.v, #params, #params.lista, tipo, tipo.tag, tipo.basico, bloco.tag)
+	nome.tipo = tipo
+	return { tag = Tag.decFuncao, v = nome, tipo = tipo, 
+           params = params, tbloco = bloco, linha = nome.linha }
+end
+
+
 local function ehExpressao (e)
 	return e.ehExp
 end
@@ -336,6 +347,29 @@ local function noDecVarL (...)
 	return listaDecVar	
 end
 
+local function noListaParam (...)
+	local t = { ... }
+	local n = #t
+	print("listaParam n = ", #t)
+	local listaDecVar = { tag = Tag.decVarLista, linha = defs.linha }
+	local lista = {}
+	local i = 1
+	local j = 1
+	while i <= n do
+    print("j = ", j, t[i].v, t[i+1].v)
+		lista[j] = {}
+		lista[j].tag = Tag.decVar
+		lista[j].tipo = t[i]
+		lista[j].linha = t[i].linha
+		lista[j].v = t[i+1].v
+		i = i + 2		
+		j = j + 1
+	end
+	print("lista = ", #lista)
+	listaDecVar.lista = lista
+	return listaDecVar	
+end
+
 
 return {
 	noInteiro = noInteiro,
@@ -359,7 +393,9 @@ return {
   noChamadaFunc = noChamadaFunc,
   noCmdChamada = noCmdChamada,
 	noDecVarL = noDecVarL,
+	noListaParam = noListaParam,
 	noDecVar = noDecVar,
+	noDecFuncao = noDecFuncao,
 	noDecArrayVar = noDecArrayVar,
 	noBloco = noBloco,
 	imprimeArvore = imprimeArvore,

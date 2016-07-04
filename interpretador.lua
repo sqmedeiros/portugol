@@ -211,6 +211,11 @@ local function decVarLista (dec, ambiente)
 	end
 end
 
+local function decFuncao (decf, ambiente)
+	print("ambietne", #ambiente)
+	tab.insereSimbolo(decf, nil, ambiente)
+end
+
 local function execCmdSe (c, ambiente)
 	local exp = avalia(c.expSe, ambiente)
 	
@@ -294,6 +299,8 @@ function execBloco (bloco, ambiente)
 	for i, v in ipairs(bloco.tbloco) do
 		if v.tag == Tag.decVarLista then
 			decVarLista(v, ambiente)
+		elseif v.tag == Tag.decFuncao then
+			decFuncao(v, ambiente)
 		else -- eh comando
 			execCmd(v, ambiente)
 		end	

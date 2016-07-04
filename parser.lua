@@ -23,10 +23,13 @@ newError("erroExpVirg", "expressão esperada após ','")
 newError("erroExpArray", "expressão esperada após '['")
 newError("erroExp", "expressão mal formada")
 newError("erroDecNome", "nome esperado após ',' ou declaração de tipo")
+newError("erroDecNomeFun", "nome esperado após 'funcao'")
 newError("erroFim", "'fim' esperado no final do comando")
+newError("erroFunFim", "'fim' esperado no final da função")
 newError("erroEnquanto", "'enquanto' esperado após 'repita'")
 newError("erroAtrib", "'=' esperado após variável")
 newError("erroTipo", "nome de tipo esperado após 'novo'")
+newError("erroTipoVirg", "nome de tipo esperado após ','")
 newError("erroFuncPredef", "'(' esperado após o nome da função")
 newError("erroFechaPar", "caractere ')' esperado")
 newError("erroFechaCol", "caractere ']' esperado")
@@ -74,7 +77,9 @@ local predef = { ["countLine"] = countLine,
 								 ["noChamadaFunc"] = arvore.noChamadaFunc,
 								 ["noCmdChamada"] = arvore.noCmdChamada,
 								 ["noDecVarL"] = arvore.noDecVarL,
+								 ["noListaParam"] = arvore.noListaParam,
 								 ["noDecVar"] = arvore.noDecVar,
+								 ["noDecFuncao"] = arvore.noDecFuncao,
 								 ["noDecArrayVar"] = arvore.noDecArrayVar,
 								 ["noBloco"] = arvore.noBloco,
 								 ["noNovoArrayExp"] = arvore.noNovoArrayExp,
@@ -90,19 +95,27 @@ re.setlabels(labelCode)
 --TODO: ver o erro quando um expressão é esperada
 -- atualmente uma Exp sempre casa, o que não dispara a regra ErroExp
 local g = re.compile([[
-  Programa     <- Sp Bloco (!. / ErroIndefinido)
-  Bloco        <- (DecVar / Comando)* -> noBloco
+  Programa     <- Sp BlocoExt (!. / ErroIndefinido)
+  BlocoExt     <- (DecFunc / DecVar / Comando)* -> noBloco
+  BlocoInt     <- (DecVar / Comando)* -> noBloco
+  DecFunc      <- (FUNCAO (Nome / ErroDecNomeFun) ABREPAR ListaParam FECHAPAR RetornaDec BlocoInt FunFim) -> noDecFuncao
+	RetornaDec   <- RETORNA Tipo / ('' ->  'nil')
   DecVar       <- (Tipo (DecVarAtrib (VIRG DecVarAtrib)*)) -> noDecVarL
+  ListaParam   <- (Tipo (Nome / ErroDecNome) (VIRG (Tipo / ErroTipoVirg) (Nome / ErroDecNome))*) -> noListaParam
   DecVarAtrib  <- ((Nome / ErroDecNome) (ATRIB (Exp / ErroExpAtrib))?) -> noDecVar
 	Comando      <- CmdSe / 
                   CmdRepita / 
-                  CmdAtrib  / ChamadaFunc -> noCmdChamada
-  CmdSe        <- (SE (Exp / ErroExpSe)  Bloco CmdSenaoSe CmdSenao CmdFim) -> noCmdSe
-	CmdSenaoSe   <- (SENAOSE  (Exp / ErroExpSenaoSe) Bloco)* -> noCmdSenaoSe
-  CmdSenao     <- (SENAO Bloco)? 
-  CmdRepita    <- REPITA  (ENQUANTO / ErroEnquanto)  ((Exp / ErroExpEnq)  Bloco) -> noCmdRepita  CmdFim
+                  CmdAtrib  / 
+                  ChamadaFunc -> noCmdChamada /
+                  CmdRetorne
+  CmdSe        <- (SE (Exp / ErroExpSe)  BlocoInt CmdSenaoSe CmdSenao CmdFim) -> noCmdSe
+	CmdSenaoSe   <- (SENAOSE  (Exp / ErroExpSenaoSe) BlocoInt)* -> noCmdSenaoSe
+  CmdSenao     <- (SENAO BlocoInt)? 
+  CmdRepita    <- REPITA  (ENQUANTO / ErroEnquanto)  ((Exp / ErroExpEnq)  BlocoInt) -> noCmdRepita  CmdFim
   CmdAtrib     <- (Var (ATRIB / ErroAtrib) (Exp / ErroExpAtrib)) -> noCmdAtrib
+  CmdRetorne   <- RETORNE Exp
   CmdFim       <- (FIM  /  ErroFim)
+  FunFim       <- (FIM  /  ErroFunFim)
   Exp          <- (ExpE  (OU (ExpE / ErroExp))*) -> noOpBoolExp
   ExpE         <- (ExpIgual (E ExpIgual)*) -> noOpBoolExp
   ExpIgual     <- (ExpComp ((IGUAL / NAOIGUAL) ExpComp)*) -> noOpCompExp
@@ -132,11 +145,14 @@ local g = re.compile([[
   TipoBase     <- INTEIRO / NUMERO / TEXTO / BOOLEANO
 	RESERVADA    <- SE / SENAOSE / SENAO / FIM / REPITA / ENQUANTO /
                   INTEIRO / NUMERO / TEXTO / BOOLEANO / FALSO / VERDADEIRO / MOD /
-                  E / OU / NAOIGUAL / NAO / NOVO / FuncPredef
+                  E / OU / NAOIGUAL / NAO / NOVO / FUNCAO / RETORNA / RETORNE / FuncPredef
   SE           <- 'se' FimNome
   SENAOSE      <- 'senaose' FimNome
   SENAO        <- 'senao' FimNome
   FIM          <- 'fim' FimNome
+  FUNCAO       <- 'funcao' FimNome
+  RETORNA      <- 'retorna' FimNome
+  RETORNE      <- 'retorne' FimNome
   ENTRADA      <- {'leia'} FimNome
   SAIDA        <- {'escreva'} FimNome
   TEXTOCOMP    <- {'textoComp'} FimNome
@@ -177,6 +193,7 @@ local g = re.compile([[
 	ErroExpSenaoSe <- ErrCount %{erroExpSenaoSe}
 	ErroExpEnq     <- ErrCount %{erroExpEnq}
 	ErroFim        <- ErrCount %{erroFim}
+	ErroFunFim     <- ErrCount %{erroFunFim}
 	ErroEnquanto   <- ErrCount %{erroEnquanto}
 	ErroExpAtrib   <- ErrCount %{erroExpAtrib}
 	ErroExpNao     <- ErrCount %{erroExpNao}
@@ -185,6 +202,7 @@ local g = re.compile([[
 	ErroExpArray   <- ErrCount %{erroExpArray}
 	ErroExp        <- ErrCount %{erroExp}
 	ErroDecNome    <- ErrCount %{erroDecNome}
+	ErroDecNomeFun <- ErrCount %{erroDecNomeFun}
 	ErroFechaPar   <- ErrCount %{erroFechaPar}
 	ErroFechaCol   <- ErrCount %{erroFechaCol}
 	ErroAbreCol    <- ErrCount %{erroAbreCol}
@@ -193,6 +211,7 @@ local g = re.compile([[
 	ErroIndefinido <- ErrCount %{erroIndefinido}
 	ErroAtrib      <- ErrCount %{erroAtrib}
 	ErroTipo       <- ErrCount %{erroTipo}
+	ErroTipoVirg   <- ErrCount %{erroTipoVirg}
 	ErrCount       <- '' => countLine
 
 ]], predef)
