@@ -87,7 +87,8 @@ predef["getTipoBasico"] = defs.getTipoBasico
 
 re.setlabels(labelCode)
 
-
+--TODO: ver o erro quando um expressão é esperada
+-- atualmente uma Exp sempre casa, o que não dispara a regra ErroExp
 local g = re.compile([[
   Programa     <- Sp Bloco (!. / ErroIndefinido)
   Bloco        <- (DecVar / Comando)* -> noBloco

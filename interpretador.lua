@@ -14,6 +14,9 @@ local function avalia (exp, ambiente)
 	if exp.p1 and exp.p2 then
 		local v1 = avalia(exp.p1, ambiente)
 		local v2 = avalia(exp.p2, ambiente)
+		if v1 == nil or v2 == nil then
+			error("(Erro)Perto da linha " .. exp.linha .. ": operação inválida com expressão sem valor")
+		end
 		local op = exp.op.op
 		if op == "opSoma" then
 			if type(v1) == "string" then
@@ -77,7 +80,7 @@ local function avalia (exp, ambiente)
 	elseif exp.tag == Tag.expArrayVar then
 		local var = tab.getValor(exp, ambiente)
 		--print("expArrayVar", var, var.v, var.tipo, var.tipo.tag, var.tipo.dim)
-		local res = getVarArrayRef(var, 1, exp.t, ambiente)
+		local res = getVarArrayRef(var, 1, exp.t, ambiente, var.linha)
 		--print("arrayVar2 res = ", res, res.v)
 		return res.v  --TODO: ver o caso de "res" ser um array
 	elseif exp.tag == Tag.expChamada then
@@ -111,18 +114,19 @@ function avaliaExpChamada (exp, ambiente)
 	elseif exp.nome.v == "leia" then
 		for i, v in ipairs(exp.args) do
 			local x
-			repeat
-				--print("vartipo", v.tipo, v.v, v.tag)
-				if v.tipo.basico == TipoBasico.inteiro or v.tipo.basico == TipoBasico.numero then
-					x = io.read("*n")
-					x = tonumber(x)
-				else
-					x = io.read()
-				end
-			until  true == true --x ~= nil
+			--print("vartipo", v.tipo, v.v, v.tag)
+			if v.tipo.basico == TipoBasico.inteiro or v.tipo.basico == TipoBasico.numero then
+				x = io.read("*n")
+				x = tonumber(x)
+			else
+				x = io.read("l")
+			end
+			if not x then
+				error("(Erro) Perto da linha " .. exp.nome.linha .. ": erro ao ler '" .. v.v .. "'") 
+			end
 			local ref = tab.getValor(v, ambiente)
 			if v.tipo.tag == TipoTag.array then
-				ref = getVarArrayRef(ref, 1, v.t, ambiente)
+				ref = getVarArrayRef(ref, 1, v.t, ambiente, v.linha)
 			end
 			tab.setValor(ref, x)
 		end
@@ -152,7 +156,7 @@ function avaliaExpChamada (exp, ambiente)
 	end			
 end
 
-function getVarArrayRef (v, i, t, ambiente)
+function getVarArrayRef (v, i, t, ambiente, linha)
 	--print("arrayRef", v, i, t)
 	if t == nil then
 		return v
@@ -163,16 +167,16 @@ function getVarArrayRef (v, i, t, ambiente)
 	--print("ref2 ",  v.array[x])
 
 	if v.n == nil then
-		error("Erro: array não inicializado")
+		error("(Erro) Perto da linha " .. linha .. " array não inicializado")
 	elseif x > v.n then
-		error("Erro: acesso a índice inválido " .. x .. " do array")
+		error("(Erro) Perto da linha " .. linha .. " acesso a índice inválido " .. x .. " do array")
 	end
 
 	if i == #t then
 		return v.array[x]		
 	end
 	
-	return getVarArrayRef(v.array[x], i + 1, t, ambiente)
+	return getVarArrayRef(v.array[x], i + 1, t, ambiente, linha)
 end
 
 local function decArrayVar (v, ambiente)
@@ -248,7 +252,7 @@ local function execCmdAtrib (c, ambiente)
 		if var.t ~= nil then
 			--print("embaixo", var.t, #var.t, var.linha)
 		end
-		ref = getVarArrayRef(ref, 1, var.t, ambiente)
+		ref = getVarArrayRef(ref, 1, var.t, ambiente, var.linha)
 		--ref.tipo = {}
 		--ref.tipo.dim = var.tim
 		--if var.t ~= nil then

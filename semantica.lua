@@ -17,10 +17,25 @@ local analisaExpChamada, analisaListaArg
 
 -- 0 significa um valor basico
 -- 1 significa um valor de uma dimensao, etc
+local function getVarDecDim (v)
+	assert(v.tag == Tag.decVar or v.tag == Tag.decArrayVar, v.tag)
+	return v.tipo.dim
+end
+
+
+-- 0 significa um valor basico
+-- 1 significa um valor de uma dimensao, etc
 local function getVarDim (v, ambiente)
-	assert(v.tag == Tag.expSimpVar or v.tag == Tag.expArrayVar)
+	assert(v.tag == Tag.expSimpVar or v.tag == Tag.expArrayVar or
+		     v.tag == Tag.decVar or v.tag == Tag.decArrayVar, v.tag)
+	
+	if v.tag == Tag.decVar or v.tag == Tag.decArrayVar then
+		return getVarDecDim(v)
+	end
+
 	local ref = tabsim.procuraSimbolo(v, ambiente)
-	if not ref then --nao achou variavel (eh possivel?)
+	if not ref then --nao achou variavel
+		assert(false, "Nao achou " .. v.v)
 		return 0 
 	end
 	local n = ref.tipo.dim
@@ -303,25 +318,19 @@ local function analisaAtrib (var, exp, ambiente)
 	elseif exp.tag == Tag.expNovoArray and var.tipo.tag ~= TipoTag.array then
 			erro("variável " .. var.v .. " não é um array", exp.linha)
 	elseif var.tipo.tag == TipoTag.array then
-		local idx = 0
-		if var.t then
-			idx = #var.t
-		end
+		local nvar = getVarDim(var, ambiente)
 		if exp.tag == Tag.expNovoArray then
-			if exp.dim > var.tipo.dim - idx then
+			if exp.dim > nvar then
 				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 			end
 		elseif exp.tipo.tag == TipoTag.array then
-			local aux = 0
-			if exp.tipo.t then
-				aux = #exp.tipo.t
-			end
-			if var.tipo.dim - idx ~= exp.tipo.dim - aux then
+			local nexp = getVarDim(exp, ambiente)
+			if nvar ~= nexp then
 				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
-			elseif var.tipo.dim -idx > 0 and var.tipo.basico ~= exp.tipo.basico then
+			elseif nvar > 0 and var.tipo.basico ~= exp.tipo.basico then
 				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 			end
-		elseif var.tipo.dim - idx > 0 then
+		elseif nvar > 0 then
 			erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 		end
 	end

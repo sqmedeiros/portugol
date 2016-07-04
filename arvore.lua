@@ -302,12 +302,6 @@ local function noDecVar (v, e)
            v = v.v, exp = e, linha = v.linha }
 end
 
---local function noDecArrayVar (v, e1, e2)
-	--print("ArrayVar123", e1, e2, v.v, v.tipo, v.tipo.tag, v.tipo.basico)
---	return { tag = Tag.decArrayVar, --tipo = makeTipo(TipoTag.array, TipoBasico.naotipado),
-  --         v = v.v, tam = e1, exp = e2, linha = v.linha }
---end
-
 local function ehExpressao (e)
 	return e.ehExp
 end
