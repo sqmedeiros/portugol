@@ -24,6 +24,6 @@ b[3][4] = 88
 
 i = 1
 repita enquanto i <= 3
-	saida(b[2][i])
+	escreva(b[2][i])
 	i = i + 1
 fim

@@ -5,10 +5,10 @@ inteiro[] y
 y = novo inteiro[x]
 
 b = a[1]
-saida("tudo bem", b)
+escreva("tudo bem", b)
 a[1] = 56
 b = a[1]
-saida("tudo bem2", b)
+escreva("tudo bem2", b)
 a[2] = 57
-saida("tudo bem2", a[2])
+escreva("tudo bem2", a[2])
 

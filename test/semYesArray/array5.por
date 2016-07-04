@@ -2,19 +2,19 @@ inteiro[] a
 
 inteiro tam
 
-saida("Tamanho do array: ")
-entrada(tam)
+escreva("Tamanho do array: ")
+leia(tam)
 a = novo inteiro[tam]
-saida("Digite os elementos do array")
+escreva("Digite os elementos do array")
 
 inteiro i = 1
 repita enquanto i <= tam
-	entrada(a[i])
+	leia(a[i])
 	i = i + 1
 fim
 
 i = 1
 repita enquanto i <= tam
-	saida(a[i])
+	escreva(a[i])
 	i = i + 1
 fim

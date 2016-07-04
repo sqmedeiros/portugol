@@ -15,6 +15,6 @@ fim
 
 i = 1
 repita enquanto i <= 3
-	saida(a[i])
+	escreva(a[i])
 	i = i + 1
 fim

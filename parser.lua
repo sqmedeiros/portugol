@@ -136,8 +136,8 @@ local g = re.compile([[
   SENAOSE      <- 'senaose' FimNome
   SENAO        <- 'senao' FimNome
   FIM          <- 'fim' FimNome
-  ENTRADA      <- {'entrada'} FimNome
-  SAIDA        <- {'saida'} FimNome
+  ENTRADA      <- {'leia'} FimNome
+  SAIDA        <- {'escreva'} FimNome
   TEXTOCOMP    <- {'textoComp'} FimNome
   TEXTOSUB     <- {'textoSub'} FimNome
   TEXTOPOS     <- {'textoPos'} FimNome

@@ -20,7 +20,7 @@ repita enquanto i <= 5
 fim
 
 se repete
-	saida("Array possui elementos repetidos")
+	escreva("Array possui elementos repetidos")
 senao
-	saida("Array nao possui elementos repetidos")
+	escreva("Array nao possui elementos repetidos")
 fim

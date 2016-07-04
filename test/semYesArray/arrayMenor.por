@@ -1,14 +1,14 @@
 inteiro[] a
 inteiro tam
 
-saida("Digite o numero de elementos do array: ")
-entrada(tam)
+escreva("Digite o numero de elementos do array: ")
+leia(tam)
 a = novo inteiro[tam]
 
 inteiro i = 1
 repita enquanto i <= tam
-	saida("Digite o elemento ", i, ": ")
-	entrada(a[i])
+	escreva("Digite o elemento ", i, ": ")
+	leia(a[i])
 	i = i + 1
 fim
 
@@ -21,4 +21,4 @@ repita enquanto i <= tam
   i = i + 1
 fim
 
-saida("Menor = ", menor)
+escreva("Menor = ", menor)

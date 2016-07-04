@@ -102,13 +102,13 @@ function avaliaNovoArrayExp (exp, ambiente)
 end
 
 function avaliaExpChamada (exp, ambiente)
-	if exp.nome.v == "saida" then
+	if exp.nome.v == "escreva" then
 		for i, v in ipairs(exp.args) do
 			local e1 = avalia(v, ambiente)
 			io.write(tostring(e1), " ")
 		end
 		io.write("\n")
-	elseif exp.nome.v == "entrada" then
+	elseif exp.nome.v == "leia" then
 		for i, v in ipairs(exp.args) do
 			local x
 			repeat

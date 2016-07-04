@@ -2,9 +2,9 @@ texto s = "bola"
 
 inteiro n = textoComp(s)
 
-saida(textoComp(s), n)
+escreva(textoComp(s), n)
 
-saida(textoComp("bola"))
+escreva(textoComp("bola"))
 
 texto[] s1 = novo texto[3]
 
@@ -14,21 +14,21 @@ s1[3] = "escola"
 
 inteiro i = 1
 repita enquanto i <= 3
-	saida(textoComp(s1[i]))
+	escreva(textoComp(s1[i]))
 	i = i + 1
 fim
 
-saida(textoSub("bola", 2, 3))
+escreva(textoSub("bola", 2, 3))
 
-saida(textoSub(s1[3], 1))
+escreva(textoSub(s1[3], 1))
 
 s = textoSub(s1[3], 2, textoComp(s1[3]))
 
-saida(s)
+escreva(s)
 
 se textoPos(s1[3], 2) == textoSub(s1[3], 2, 2)
-  saida("Igual")
+  escreva("Igual")
 fim
 
-saida(textoPos(s, 1))
-saida(textoPos(s, 10))
+escreva(textoPos(s, 1))
+escreva(textoPos(s, 10))

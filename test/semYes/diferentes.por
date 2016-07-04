@@ -1,11 +1,11 @@
 inteiro x, y
 
-entrada(x, y)
+leia(x, y)
 
 se x nao= y
-  saida("x e y sao diferentes")
+  escreva("x e y sao diferentes")
 fim
 
 se nao (x == y)
-  saida("x e y sao diferentes")
+  escreva("x e y sao diferentes")
 fim

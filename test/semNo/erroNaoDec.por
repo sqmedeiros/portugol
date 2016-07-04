@@ -8,9 +8,9 @@ inteiro b = 7
 
 se a > 8
 	inteiro c = 2
-	saida(c)
+	escreva(c)
 senao
 	c = 8
 fim
 
-saida(c)
+escreva(c)

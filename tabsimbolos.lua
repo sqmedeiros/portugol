@@ -7,8 +7,8 @@ local idxGlobal = 1
 local ambiente
 
 local tglobal = { 
-	["entrada"] = {},
-  ["saida"] = {}
+	["leia"] = {},
+  ["escreva"] = {}
 }
 
 local function criaAmbiente (g)

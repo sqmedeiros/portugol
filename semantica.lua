@@ -221,12 +221,12 @@ function analisaExpOpBool (exp, ambiente)
 end
 
 function analisaExpChamada (exp, ambiente)
-	if exp.nome.v == "saida" then
+	if exp.nome.v == "escreva" then
 		for i, v in ipairs(exp.args) do
 			analisaExp(v, ambiente)
 		end
 		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.vazio)	
-	elseif exp.nome.v == "entrada" then
+	elseif exp.nome.v == "leia" then
 		for i, v in ipairs(exp.args) do
 			analisaExp(v, ambiente)
 		end	

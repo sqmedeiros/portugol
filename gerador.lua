@@ -112,14 +112,14 @@ local function geraDecVar (v, listaDec)
 end
 
 function geraChamada (c, ambiente)
-	if c.nome.v == "saida" then
+	if c.nome.v == "escreva" then
 		geraCodigoEspaco('cout')
 		for i, v in ipairs(c.args) do
 			geraCodigoEspaco('<<')
 			geraExp(v)
 		end
 		geraCodigoLinha('<< endl;')
-	elseif c.nome.v == "entrada" then
+	elseif c.nome.v == "leia" then
 		geraCodigoEspaco('cin')
 		for i, v in ipairs(c.args) do
 			geraCodigoEspaco('>>')

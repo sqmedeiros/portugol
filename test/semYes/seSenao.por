@@ -1,5 +1,5 @@
 inteiro x = 1
-saida("agora")
+escreva("agora")
 
 se x > 33
   x = 111
@@ -11,5 +11,5 @@ senaose x > 11
   x = 888
 senao
   x = 22
-  saida("agora entendi o erro", 777)
+  escreva("agora entendi o erro", 777)
 fim
