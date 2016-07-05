@@ -31,7 +31,7 @@ local TipoTag = { array = {}, simples = {}, naotipado = {} }
 local TipoBasico = { naotipado = {}, bool = {}, inteiro = {}, numero = {}, texto = {}, vazio = {} }
 
 local Tag = { decVar = {}, decFuncao = {}, decArrayVar = {}, decVarLista = {}, bloco = {},
-              cmdAtrib = {}, cmdRepita = {}, cmdSe = {}, cmdSenaoSe = {},
+              cmdAtrib = {}, cmdRepita = {}, cmdSe = {}, cmdSenaoSe = {}, cmdRetorne = {},
               blocoSenaoSe = {},
               expBool = {}, expInt = {}, expNum = {}, expTexto = {}, expNovoArray = {},
               expSimpVar = {}, expArrayVar = {}, expOpNum = {}, expOpComp = {}, expOpBool = {},

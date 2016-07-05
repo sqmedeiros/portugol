@@ -80,7 +80,7 @@ local function avalia (exp, ambiente)
 	elseif exp.tag == Tag.expArrayVar then
 		local var = tab.getValor(exp, ambiente)
 		--print("expArrayVar", var, var.v, var.tipo, var.tipo.tag, var.tipo.dim)
-		local res = getVarArrayRef(var, 1, exp.t, ambiente, var.linha)
+		local res = getVarArrayRef(var, 1, exp.t, ambiente, var.linha or exp.linha)
 		--print("arrayVar2 res = ", res, res.v)
 		return res.v  --TODO: ver o caso de "res" ser um array
 	elseif exp.tag == Tag.expChamada then

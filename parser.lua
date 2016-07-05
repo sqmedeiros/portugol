@@ -76,6 +76,7 @@ local predef = { ["countLine"] = countLine,
 								 ["noCmdSenaoSe"] = arvore.noCmdSenaoSe,
 								 ["noChamadaFunc"] = arvore.noChamadaFunc,
 								 ["noCmdChamada"] = arvore.noCmdChamada,
+								 ["noCmdRetorne"] = arvore.noCmdRetorne,
 								 ["noDecVarL"] = arvore.noDecVarL,
 								 ["noListaParam"] = arvore.noListaParam,
 								 ["noDecVar"] = arvore.noDecVar,
@@ -98,10 +99,10 @@ local g = re.compile([[
   Programa     <- Sp BlocoExt (!. / ErroIndefinido)
   BlocoExt     <- (DecFunc / DecVar / Comando)* -> noBloco
   BlocoInt     <- (DecVar / Comando)* -> noBloco
-  DecFunc      <- (FUNCAO (Nome / ErroDecNomeFun) ABREPAR ListaParam FECHAPAR RetornaDec BlocoInt FunFim) -> noDecFuncao
-	RetornaDec   <- RETORNA Tipo / ('' ->  'nil')
+  DecFunc      <- (FUNCAO (Nome / ErroDecNomeFun) ABREPAR ListaParam FECHAPAR RetornaDec? BlocoInt FunFim) -> noDecFuncao
+	RetornaDec   <- RETORNA Tipo
   DecVar       <- (Tipo (DecVarAtrib (VIRG DecVarAtrib)*)) -> noDecVarL
-  ListaParam   <- (Tipo (Nome / ErroDecNome) (VIRG (Tipo / ErroTipoVirg) (Nome / ErroDecNome))*) -> noListaParam
+  ListaParam   <- (Tipo (Nome / ErroDecNome) (VIRG (Tipo / ErroTipoVirg) (Nome / ErroDecNome))*)? -> noListaParam
   DecVarAtrib  <- ((Nome / ErroDecNome) (ATRIB (Exp / ErroExpAtrib))?) -> noDecVar
 	Comando      <- CmdSe / 
                   CmdRepita / 
@@ -113,7 +114,7 @@ local g = re.compile([[
   CmdSenao     <- (SENAO BlocoInt)? 
   CmdRepita    <- REPITA  (ENQUANTO / ErroEnquanto)  ((Exp / ErroExpEnq)  BlocoInt) -> noCmdRepita  CmdFim
   CmdAtrib     <- (Var (ATRIB / ErroAtrib) (Exp / ErroExpAtrib)) -> noCmdAtrib
-  CmdRetorne   <- RETORNE Exp
+  CmdRetorne   <- RETORNE Exp? -> noCmdRetorne
   CmdFim       <- (FIM  /  ErroFim)
   FunFim       <- (FIM  /  ErroFunFim)
   Exp          <- (ExpE  (OU (ExpE / ErroExp))*) -> noOpBoolExp

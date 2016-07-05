@@ -52,9 +52,22 @@ local function ehValorBasico (v, ambiente)
 	if v.tag == Tag.expNovoArray then
 		return false
 	end
+	if v.tag == Tag.expChamada then 
+		return not v.tipo.dim 
+	end
+
 	-- eh uma variavel
 	return getVarDim(v, ambiente) == 0
 end
+
+local function setTipoRetorno (tipo, ambiente)
+	ambiente["__tipoRetorno"] = tipo
+end
+
+local function getTipoRetorno (ambiente)
+	return ambiente["__tipoRetorno"]
+end
+
 
 local function analisaExp (exp, ambiente)
 	assert(ambiente, "Ambiente nulo")
@@ -126,11 +139,9 @@ end
 
 
 function analisaExpNovoArray (exp, ambiente)
-	--print("eueueu", exp, exp.v)
 	for k, v in ipairs(exp.v) do
 		if v.ehExp then
 			analisaExp(v, ambiente)
-			--print("bla", v.tag, v.tipo.basico, TipoBasico.inteiro, v.v)
 			if v.tipo.basico ~= TipoBasico.inteiro then
 				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", v.linha)
 			end
@@ -138,7 +149,6 @@ function analisaExpNovoArray (exp, ambiente)
 				erro("a expressão que indica o tamanho de um array deve ser do tipo inteiro", v.linha)
 			end 
 		else
-			--print("cabou analisaExpNovoArray")
 			break
 		end	
 	end
@@ -174,7 +184,6 @@ function analisaExpOpNum (exp, ambiente)
 
 	local tb1 = p1.tipo.basico
 	local tb2 = p2.tipo.basico
-	--print("tb1 = ", tb1)
 	if tipo.tiposCompativeis(tb1, TipoBasico.numero) and tipo.tiposCompativeis(tb2, TipoBasico.numero) then
 		if exp.op.op == "opMod" then
 			if tb1 ~= TipoBasico.inteiro or tb2 ~= TipoBasico.inteiro then
@@ -239,27 +248,35 @@ function analisaParametrosFunc (func, exp, ambiente)
 	local n1 = #func.params.lista
 	local n2 = #exp.args
 	if n1 ~= n2 then
-		erro("função '" .. func.nome .. "' espera " .. n1 .. " parâmetro(s), mas foi chamada com " .. n2, exp.linha)
+		local linha = exp.linha
+		if n2 > 0 then
+			linha = exp.args[1].linha
+		end
+		erro("função '" .. func.v .. "' espera " .. n1 .. " parâmetro(s), mas foi chamada com " .. n2, linha)
+		return
 	end
-	
+
 	for i, v in ipairs(exp.args) do
 		analisaExp(v, ambiente)
 		local x = func.params.lista[i]
-		print(x.tipo.basico, v.tipo.basico, tiposCompativeis(v.tipo, x.tipo))
-		analisaAtrib(x, v, ambiente) 
+	  --print(x.tipo.basico, v.tipo.basico, tiposCompativeis(v.tipo, x.tipo))
+		x.linha = v.linha
+		analisaAtrib(x, v, ambiente, true) 
 	end
 end
 
 function analisaExpChamadaAux (exp, ambiente)
 	local ref = tabsim.procuraSimbolo(exp.nome, ambiente)
+	--print("exp.nome.v", exp.nome.v)
 	if not ref.params then -- eh funcao?
-		erro("função '" .. exp.nome.v .. "' não declarada", exp.linha)
+		erro("função '" .. exp.nome.v .. "' não declarada", exp.nome.linha)
 		return
 	end
 
 	analisaParametrosFunc(ref, exp, ambiente)	
 	exp.tipo = ref.tipo
-	print("exp.tipo = ", exp.tipo.basico)
+	exp.dim = ref.tipo.dim
+	--print("exp.tipo = ", exp.tipo.basico, exp.tipo.tag)
 
 end
 
@@ -327,7 +344,7 @@ function analisaListaArg(arg, param, ambiente)
 end
 
 
-function analisaAtrib (var, exp, ambiente)
+function analisaAtrib (var, exp, ambiente, ehParametro)
 	if var.tag == Tag.expArrayVar then
 		analisaExpArrayVar(var, ambiente)
 	end	
@@ -340,26 +357,32 @@ function analisaAtrib (var, exp, ambiente)
 
 	--print("analisaAtrib ", var, var.v, var.tipo, var.tipo.tag, exp.dim, var.tipo.dim)
 	if not tipo.tiposCompativeis(var.tipo.basico, exp.tipo.basico, true) then
-		local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico .. " à variável "
+		local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico
+		if ehParametro then
+			s = s .. " ao parâmetro "
+		else
+		 	s = s .. " à variável "
+		end
     s = s .. "'" .. var.v .. "' do tipo " .. var.tipo.basico
-		erro(s, exp.linha)
-	elseif exp.tag == Tag.expNovoArray and var.tipo.tag ~= TipoTag.array then
-			erro("variável '" .. var.v .. "' não é um array", exp.linha)
+		erro(s, var.linha)
+	elseif (exp.tag == Tag.expNovoArray or (exp.tag == Tag.expChamada and exp.tipo.tag == TipoTag.array)) and
+         var.tipo.tag ~= TipoTag.array then
+			erro("variável '" .. var.v .. "' não é um array", var.linha)
 	elseif var.tipo.tag == TipoTag.array then
 		local nvar = getVarDim(var, ambiente)
-		if exp.tag == Tag.expNovoArray then
-			if exp.dim > nvar then
-				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", exp.linha)
+		if exp.tag == Tag.expNovoArray or (exp.tag == Tag.expChamada and exp.tipo.tag == TipoTag.array) then
+			if exp.dim ~= nvar then
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 			end
 		elseif exp.tipo.tag == TipoTag.array then
 			local nexp = getVarDim(exp, ambiente)
 			if nvar ~= nexp then
-				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", exp.linha)
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 			elseif nvar > 0 and var.tipo.basico ~= exp.tipo.basico then
-				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", exp.linha)
+				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 			end
 		elseif nvar > 0 then
-			erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", exp.linha)
+			erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
 		end
 	end
 end
@@ -421,12 +444,56 @@ local function analisaCmdChamada (c, ambiente)
 	analisaExpChamada(c, ambiente)
 end
 
+local function analisaCmdRetorne (c, ambiente)
+	local tipoRetorno = getTipoRetorno(ambiente)
+	
+	if not tipoRetorno then
+		erro("Comando 'retorne' deve ser usado dentro de uma função", c.linha)
+		return
+	end
+
+	if not c.exp then
+		if tipoRetorno.basico ~= vazio then
+			erro("Função deve retornar uma expressão", c.linha)
+		end
+	else
+		analisaExp(c.exp, ambiente)
+		
+		if tipoRetorno.basico == vazio then
+			erro("Função foi declarada com tipo 'vazio' e não deveria retornar uma expressão", c.exp.linha)
+			return
+		end
+
+		local b1 = ehValorBasico(c.exp, ambiente)
+		local b2 = tipoRetorno.dim == nil
+
+		if b1 ~= b2 then
+			erro("Tipo de retorno incompatível", c.exp.linha)
+		elseif not b1 and c.exp.tipo.basico ~= tipoRetorno.basico then
+			erro("Tipo de retorno incompatível com " .. tipoRetorno.basico, c.exp.linha)
+		elseif not tipo.tiposCompativeis(c.exp.tipo.basico, tipoRetorno.basico) then
+			erro("Tipo de retorno incompatível com " .. tipoRetorno.basico, c.exp.linha)
+		elseif not b2 then 
+			local n2
+			if c.exp.tag == Tag.expNovoArray or c.exp.tag == Tag.expChamada then
+				n2 = c.exp.dim
+			else
+				n2 = getVarDim(c.exp, ambiente)
+			end	
+			if n2 ~= tipoRetorno.dim then   -- eh array
+				erro("Tipo de retorno incompatível", c.exp.linha)
+			end
+		end 
+	end
+end
+
 local function analisaComando (c, ambiente)
 	if c.tag == Tag.cmdAtrib then
 		local var = tabsim.procuraSimbolo(c.p1, ambiente)
 		local exp = c.p2
 		if var ~= nil then
 			c.p1.tipo = var.tipo
+			var.linha = c.p1.linha
 			--print("analisaComando", var.tipo.tag, var.tipo.dim, c.p1.tipo.dim)
 			if var.tipo.tag == TipoTag.array and var.tipo.dim < c.p1.tipo.dim then
 				erro("array '" .. c.p1.v .. "' possui somente " .. var.tipo.dim .. " dimensão(ões)", c.p1.linha)
@@ -441,6 +508,8 @@ local function analisaComando (c, ambiente)
 		analisaCmdRepita(c, ambiente)
 	elseif c.tag == Tag.cmdChamada then
 		analisaCmdChamada(c, ambiente)
+	elseif c.tag == Tag.cmdRetorne then
+		analisaCmdRetorne(c, ambiente)
 	else
 		error("Comando desconhecido")
 	end
@@ -450,10 +519,12 @@ function analisaDecFuncao (decFun, ambiente)
 	tabsim.insereSimbolo(decFun.v, ambiente, decFun.params)
 	tabsim.entraBloco(ambiente)
 	for i, v in ipairs(decFun.params.lista) do
-		print(i, v, v.v)
+		--print(i, v, v.v)
 		analisaDecVar(v, ambiente)
 	end
+	setTipoRetorno(decFun.tipo, ambiente)
 	analisaBloco(decFun.tbloco, ambiente, true)	
+	setTipoRetorno(nil, ambiente)
 	tabsim.saiBloco(ambiente)
 end
 

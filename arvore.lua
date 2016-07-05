@@ -267,6 +267,14 @@ local function noCmdRepita (e, b)
 	return { tag = Tag.cmdRepita, exp = e, bloco = b, linha = defs.linha }
 end
 
+local function noCmdRetorne (e)
+	if e == "" then --TODO: rever o parser: uma Exp sempre casa
+		e = nil 
+	end
+	return { tag = Tag.cmdRetorne, exp = e, linha = defs.linha }
+end
+
+
 
 local function noCmdSenaoSe (...)
 	local t = { ... }
@@ -306,9 +314,14 @@ local function noDecVar (v, e)
 end
 
 local function noDecFuncao (nome, params, tipo, bloco)
-	print("noDecFunc", nome.v, #params, #params.lista, tipo, tipo.tag, tipo.basico, bloco.tag)
+	--print("noDecFunc", nome.v, "eita", params, tipo, "bloco", bloco, tipo.dim)
+	--print("noDecFunc", nome.v, #params, #params.lista, tipo, tipo.tag, tipo.basico, bloco.tag)
+	if bloco == nil then
+		bloco = tipo
+		tipo = makeTipo(TipoTag.simples, TipoBasico.vazio)
+	end
 	nome.tipo = tipo
-	return { tag = Tag.decFuncao, v = nome, tipo = tipo, 
+	return { tag = Tag.decFuncao, v = nome, tipo = tipo, dim = tipo.dim,
            params = params, tbloco = bloco, linha = nome.linha }
 end
 
@@ -320,7 +333,7 @@ end
 local function ehComando (e)
 	return e.tag == Tag.cmdSe or e.tag == Tag.cmdSenaoSe or
          e.tag == Tag.cmdRepita or e.tag == Tag.cmdAtrib or
-         e.tag == Tag.cmdChamada          
+         e.tag == Tag.cmdChamada or e.tag == Tag.cmdRetorne          
 end
 
 
@@ -350,13 +363,12 @@ end
 local function noListaParam (...)
 	local t = { ... }
 	local n = #t
-	print("listaParam n = ", #t)
 	local listaDecVar = { tag = Tag.decVarLista, linha = defs.linha }
 	local lista = {}
 	local i = 1
 	local j = 1
-	while i <= n do
-    print("j = ", j, t[i].v, t[i+1].v)
+	while i + 1 <= n do
+    --print("j = ", j, t[i].v, t[i+1].v)
 		lista[j] = {}
 		lista[j].tag = Tag.decVar
 		lista[j].tipo = t[i]
@@ -365,7 +377,6 @@ local function noListaParam (...)
 		i = i + 2		
 		j = j + 1
 	end
-	print("lista = ", #lista)
 	listaDecVar.lista = lista
 	return listaDecVar	
 end
@@ -392,6 +403,7 @@ return {
 	noCmdSenaoSe = noCmdSenaoSe,
   noChamadaFunc = noChamadaFunc,
   noCmdChamada = noCmdChamada,
+  noCmdRetorne = noCmdRetorne,
 	noDecVarL = noDecVarL,
 	noListaParam = noListaParam,
 	noDecVar = noDecVar,

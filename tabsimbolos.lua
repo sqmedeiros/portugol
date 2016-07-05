@@ -34,7 +34,7 @@ end
 local function insereSimbolo (simbolo, ambiente, params)
 	local n = #ambiente
 	local nome = simbolo.v
-	print("insere tipo = ", nome)
+	--print("insere tipo = ", nome)
 	--print("insere tipo = ", simbolo.tipo, simbolo.tipo.basico, simbolo.tipo.tag)
 	if ambiente[n][nome] then
 		erro("o símbolo '" .. nome .. "' jah foi declarado nesse escopo", simbolo.linha) 
