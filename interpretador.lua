@@ -8,6 +8,7 @@ local Tag = defs.Tag
 
 local avaliaNovoArrayExp, avaliaExpChamada
 local getVarArrayRef
+local execBlocoFuncao
 
 local function avalia (exp, ambiente)
 	assert(ambiente ~= nil)
@@ -104,6 +105,35 @@ function avaliaNovoArrayExp (exp, ambiente)
 	return exp.nexp, res
 end
 
+function avaliaExpChamadaAux (exp, ambiente)
+	local t = {}
+	for i, v in ipairs(exp.args) do
+		local s = avalia(v, ambiente)
+		if s == nil then
+			error("Variável " .. v.v .. " não foi inicializada")
+		end
+		t[#t + 1] = s
+	end
+
+	error("Falta terminar")
+	local f = tab.getValor(exp, ambiente)
+	local params = f.params
+
+	tab.entraBloco(ambiente)
+
+	for i, v in ipairs(params) do
+		if v.tag == Tag.decVar then
+			decVar(v, ambiente, t[i])
+		else
+			error("Falta tratar parâmetros do tipo array")
+		end
+	end
+	
+	execBlocoFuncao(exp.tbloco, ambiente)
+	tab.saiBloco(ambiente)
+end
+
+
 function avaliaExpChamada (exp, ambiente)
 	if exp.nome.v == "escreva" then
 		for i, v in ipairs(exp.args) do
@@ -152,7 +182,7 @@ function avaliaExpChamada (exp, ambiente)
 		exp.args[3] = exp.args[2]
 		return avaliaExpChamada(exp, ambiente)
 	else
-		error("Função inválida")
+		return avaliaExpChamadaAux(exp, ambiente)
 	end			
 end
 
@@ -189,10 +219,12 @@ local function decArrayVar (v, ambiente)
 	tab.insereSimbolo(v, nexp, ambiente, v.tipo.dim, t)	
 end
 
-local function decVar (v, ambiente)
+local function decVar (v, ambiente, aux)
 	local exp
 	if v.exp then
 		exp = avalia(v.exp, ambiente)
+	elseif aux then
+		exp = aux
 	end
 	tab.insereSimbolo(v, exp, ambiente) 
 end
@@ -292,6 +324,17 @@ local function execCmd (c, ambiente)
 		error("Comando desconhecido")
 	end
 end
+
+function execBlocoFuncao (bloco, ambiente)
+	for i, v in ipairs(bloco.tbloco) do
+		if v.tag == Tag.decVarLista then
+			decVarLista(v, ambiente)
+		else -- eh comando
+			execCmd(v, ambiente)
+		end	
+	end
+end
+
 
 function execBloco (bloco, ambiente)
 	tab.entraBloco(ambiente)

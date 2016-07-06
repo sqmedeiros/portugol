@@ -6,7 +6,6 @@ funcao soma4 (inteiro a, inteiro b) retorna inteiro[]
 	inteiro[][] x
 	retorne novo inteiro[10]
 	retorne x[10]
-	retorne
 fim
 
 funcao soma (inteiro a, inteiro b) retorna inteiro

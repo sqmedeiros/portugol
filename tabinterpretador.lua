@@ -48,7 +48,6 @@ end
 local function insereSimbolo (var, valor, ambiente, dim, t)
 	local n = #ambiente
 	local dim = var.tipo.dim
-	local nome = var.v
 	if var.tag == Tag.decArrayVar then
 		local nome = var.v
 		--print("INSERE ", var.tipo, var.v, var.tipo.tag, var.tipo.basico, valor, t)
@@ -57,7 +56,11 @@ local function insereSimbolo (var, valor, ambiente, dim, t)
 			inicializaNovoArray(ambiente[n][nome], valor, t, 1)
 		end
 	elseif var.tag == Tag.decFuncao then
-		error("Inserindo funcao")	
+		local nome = var.v.v
+		print(var.tag, var.v, var.v.v)
+		ambiente[n][nome] = { tipo = var.tipo, dim = var.dim,
+                          params = var.params, tbloco = var.tbloco, func = true  }
+		--error("Inserindo funcao " .. nome)	
 	else
 		local nome = var.v
 		ambiente[n][nome] = { v = valor, tipo = var.tipo }
