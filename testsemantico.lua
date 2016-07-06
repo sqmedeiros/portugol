@@ -108,6 +108,7 @@ novoTeste("erroTextoSub.por", 10)
 novoTeste("erroTextoPos.por", 8)
 novoTeste("funcaoSoma.por", 16)
 novoTeste("funcaoArray.por", 4)
+novoTeste("funcaoArray2.por", 6)
 
 local dir = "./test/semNo"
 makeTeste(arqTeste, dir)

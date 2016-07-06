@@ -17,8 +17,12 @@ funcao soma3 (inteiro a, inteiro b) retorna inteiro
 	retorne a + b
 fim
 
-funcao soma4 ()
-	retorne a + b //Erro: 'a' e 'b' não declarados (3 erros)
+funcao soma4 (numero a, numero b) retorna numero
+	retorne a + b
+fim
+
+funcao soma5 ()
+	retorne a + b //Erro: 'a' e 'b' não declarados (2 erros)
 	texto t
 	retorne t  //Erro: função não retorna valores
 fim
@@ -36,5 +40,6 @@ a = soma3(3)    //Erro
 a = soma3()     //Erro
 a = soma3(3.0, 4.0)  //Erro
 a = soma4(3, 4) //Erro
+a = soma5(3, 4) //Erro
 
 c = soma2(a, b) //Ok

@@ -257,7 +257,7 @@ function analisaParametrosFunc (func, exp, ambiente)
 	end
 
 	for i, v in ipairs(exp.args) do
-		analisaExp(v, ambiente)
+		--analisaExp(v, ambiente)
 		local x = func.params.lista[i]
 	  --print(x.tipo.basico, v.tipo.basico, tiposCompativeis(v.tipo, x.tipo))
 		x.linha = v.linha
@@ -268,8 +268,12 @@ end
 function analisaExpChamadaAux (exp, ambiente)
 	local ref = tabsim.procuraSimbolo(exp.nome, ambiente)
 	--print("exp.nome.v", exp.nome.v)
+	if not ref then --nao declarou o símbolo
+		return
+	end
+
 	if not ref.params then -- eh funcao?
-		erro("função '" .. exp.nome.v .. "' não declarada", exp.nome.linha)
+		erro("'" .. exp.nome.v .. "' não é o nome de uma função", exp.nome.linha)
 		return
 	end
 
@@ -328,22 +332,6 @@ function analisaExpChamada (exp, ambiente)
 	end
 end
 
-function analisaListaArg(arg, param, ambiente)
-	local narg = #arg
-	local nparam = #nparam
-	if narg ~= nparam then
-		erro("função espera " .. nparam .. " parâmetros(s), mas foi chamada com " .. narg, arg.linha)
-		return
-	end
-	for i, v in ipairs(arg) do
-		analisaExp(v, ambiente)
-		if not tipo.tiposCompativeis(v.tipo.basico, param[i].tipo.basico) then
-			erro("parâmetro ", v.linha)
-		end
-	end
-end
-
-
 function analisaAtrib (var, exp, ambiente, ehParametro)
 	if var.tag == Tag.expArrayVar then
 		analisaExpArrayVar(var, ambiente)
@@ -355,14 +343,16 @@ function analisaAtrib (var, exp, ambiente, ehParametro)
 		return
 	end
 
+	local aux = ""
+	if ehParametro then
+		aux = " ao parâmetro "
+	else
+		aux = " à variável "
+	end
+
 	--print("analisaAtrib ", var, var.v, var.tipo, var.tipo.tag, exp.dim, var.tipo.dim)
 	if not tipo.tiposCompativeis(var.tipo.basico, exp.tipo.basico, true) then
-		local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico
-		if ehParametro then
-			s = s .. " ao parâmetro "
-		else
-		 	s = s .. " à variável "
-		end
+		local s = "não pode atribuir expressão do tipo " .. exp.tipo.basico .. aux
     s = s .. "'" .. var.v .. "' do tipo " .. var.tipo.basico
 		erro(s, var.linha)
 	elseif (exp.tag == Tag.expNovoArray or (exp.tag == Tag.expChamada and exp.tipo.tag == TipoTag.array)) and
@@ -372,7 +362,7 @@ function analisaAtrib (var, exp, ambiente, ehParametro)
 		local nvar = getVarDim(var, ambiente)
 		if exp.tag == Tag.expNovoArray or (exp.tag == Tag.expChamada and exp.tipo.tag == TipoTag.array) then
 			if exp.dim ~= nvar then
-				erro("tentativa de atribuir tipo incompatível para a variável '" .. var.v .. "'", var.linha)
+				erro("tentativa de atribuir tipo incompatível" .. aux .. "'" .. var.v .. "'", var.linha)
 			end
 		elseif exp.tipo.tag == TipoTag.array then
 			local nexp = getVarDim(exp, ambiente)
@@ -446,7 +436,7 @@ end
 
 local function analisaCmdRetorne (c, ambiente)
 	local tipoRetorno = getTipoRetorno(ambiente)
-	
+
 	if not tipoRetorno then
 		erro("Comando 'retorne' deve ser usado dentro de uma função", c.linha)
 		return
@@ -456,11 +446,14 @@ local function analisaCmdRetorne (c, ambiente)
 		if tipoRetorno.basico ~= vazio then
 			erro("Função deve retornar uma expressão", c.linha)
 		end
-	else
-		analisaExp(c.exp, ambiente)
-		
+	else	
 		if tipoRetorno.basico == vazio then
 			erro("Função foi declarada com tipo 'vazio' e não deveria retornar uma expressão", c.exp.linha)
+			return
+		end
+
+		analisaExp(c.exp, ambiente)
+		if c.exp.tipo.basico == TipoBasico.naotipado then
 			return
 		end
 
