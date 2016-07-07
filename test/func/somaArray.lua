@@ -22,6 +22,15 @@ function somaArray (x, y, n)
 	return soma
 end
 
+function imprimeArray (x, n)
+	local i = 1
+	while i <= n do
+		print(x[i])
+		i = i + 1
+	end
+end
+
+
 a = {}
 a[1] = 1
 a[2] = 3
@@ -42,9 +51,9 @@ b[5] = 1
 
 local c = somaArray(a, b, 5)
 
-local i = 1
-while i <= 5 do
-	print(c[i])
-	i = i + 1
-end
+print("Vai imprimir 1")
+imprimeArray(c, 5)
+
+print("Vai imprimir 2")
+imprimeArray(somaArray(a, b, 5), 5)
 

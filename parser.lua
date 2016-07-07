@@ -107,8 +107,8 @@ local g = re.compile([[
   DecVarAtrib  <- ((Nome / ErroDecNome) (ATRIB (Exp / ErroExpAtrib))?) -> noDecVar
 	Comando      <- CmdSe / 
                   CmdRepita / 
-                  CmdAtrib  / 
                   ChamadaFunc -> noCmdChamada /
+                  CmdAtrib  / 
                   CmdRetorne
   CmdSe        <- (SE (Exp / ErroExpSe)  BlocoInt CmdSenaoSe CmdSenao CmdFim) -> noCmdSe
 	CmdSenaoSe   <- (SENAOSE  (Exp / ErroExpSenaoSe) BlocoInt)* -> noCmdSenaoSe

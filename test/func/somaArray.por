@@ -22,6 +22,13 @@ funcao somaArray (inteiro[] x, inteiro[] y, inteiro n) retorna inteiro[]
 	retorne soma
 fim
 
+funcao imprimeArray (inteiro[] x, inteiro n)
+	inteiro i = 1
+	repita enquanto i <= n
+		escreva(x[i])
+		i = i + 1
+	fim
+fim
 
 
 inteiro[] a = novo inteiro[5]
@@ -44,8 +51,8 @@ b[5] = 1
 
 inteiro[] c = somaArray(a, b, 5)
 
-inteiro i = 1
-repita enquanto i <= 5
-	escreva(c[i])
-	i = i + 1
-fim
+escreva("Vai imprimir 1")
+imprimeArray(c, 5)
+
+escreva("Vai imprimir 2")
+imprimeArray(somaArray(a, b, 5), 5)
