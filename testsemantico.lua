@@ -133,7 +133,17 @@ for file in lfs.dir(dir) do
 		novoTeste(file, 0)
 	end
 end
+makeTeste(arqTeste, dir)
+print("OK Yes Array")
+
+dir = "./test/func"
+arqTeste = {}
+for file in lfs.dir(dir) do
+	if isValid(file) then
+		novoTeste(file, 0)
+	end
+end
 
 makeTeste(arqTeste, dir)
-print("OK YesArray")
+print("OK Yes Func")
 

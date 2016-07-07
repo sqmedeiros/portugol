@@ -249,9 +249,6 @@ function analisaParametrosFunc (func, exp, ambiente)
 	local n2 = #exp.args
 	if n1 ~= n2 then
 		local linha = exp.linha
-		if n2 > 0 then
-			linha = exp.args[1].linha
-		end
 		erro("função '" .. func.v .. "' espera " .. n1 .. " parâmetro(s), mas foi chamada com " .. n2, linha)
 		return
 	end
@@ -448,7 +445,7 @@ local function analisaCmdRetorne (c, ambiente)
 		end
 	else	
 		if tipoRetorno.basico == vazio then
-			erro("Função foi declarada com tipo 'vazio' e não deveria retornar uma expressão", c.exp.linha)
+			erro("Função foi declarada com tipo 'vazio' e não deveria retornar uma expressão", c.linha)
 			return
 		end
 
@@ -461,11 +458,11 @@ local function analisaCmdRetorne (c, ambiente)
 		local b2 = tipoRetorno.dim == nil
 
 		if b1 ~= b2 then
-			erro("Tipo de retorno incompatível", c.exp.linha)
+			erro("Tipo de retorno incompatível", c.linha)
 		elseif not b1 and c.exp.tipo.basico ~= tipoRetorno.basico then
-			erro("Tipo de retorno incompatível com " .. tipoRetorno.basico, c.exp.linha)
+			erro("Tipo de retorno incompatível com " .. tipoRetorno.basico, c.linha)
 		elseif not tipo.tiposCompativeis(c.exp.tipo.basico, tipoRetorno.basico) then
-			erro("Tipo de retorno incompatível com " .. tipoRetorno.basico, c.exp.linha)
+			erro("Tipo de retorno incompatível com " .. tipoRetorno.basico, c.linha)
 		elseif not b2 then 
 			local n2
 			if c.exp.tag == Tag.expNovoArray or c.exp.tag == Tag.expChamada then
@@ -474,7 +471,7 @@ local function analisaCmdRetorne (c, ambiente)
 				n2 = getVarDim(c.exp, ambiente)
 			end	
 			if n2 ~= tipoRetorno.dim then   -- eh array
-				erro("Tipo de retorno incompatível", c.exp.linha)
+				erro("Tipo de retorno incompatível", c.linha)
 			end
 		end 
 	end

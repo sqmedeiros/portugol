@@ -77,6 +77,7 @@ local predef = { ["countLine"] = countLine,
 								 ["noChamadaFunc"] = arvore.noChamadaFunc,
 								 ["noCmdChamada"] = arvore.noCmdChamada,
 								 ["noCmdRetorne"] = arvore.noCmdRetorne,
+								 ["noKwRetorne"] = arvore.noKwRetorne,
 								 ["noDecVarL"] = arvore.noDecVarL,
 								 ["noListaParam"] = arvore.noListaParam,
 								 ["noDecVar"] = arvore.noDecVar,
@@ -114,7 +115,7 @@ local g = re.compile([[
   CmdSenao     <- (SENAO BlocoInt)? 
   CmdRepita    <- REPITA  (ENQUANTO / ErroEnquanto)  ((Exp / ErroExpEnq)  BlocoInt) -> noCmdRepita  CmdFim
   CmdAtrib     <- (Var (ATRIB / ErroAtrib) (Exp / ErroExpAtrib)) -> noCmdAtrib
-  CmdRetorne   <- RETORNE Exp? -> noCmdRetorne
+  CmdRetorne   <- (RETORNE Exp?) -> noCmdRetorne
   CmdFim       <- (FIM  /  ErroFim)
   FunFim       <- (FIM  /  ErroFunFim)
   Exp          <- (ExpE  (OU (ExpE / ErroExp))*) -> noOpBoolExp
@@ -153,7 +154,7 @@ local g = re.compile([[
   FIM          <- 'fim' FimNome
   FUNCAO       <- 'funcao' FimNome
   RETORNA      <- 'retorna' FimNome
-  RETORNE      <- 'retorne' FimNome
+  RETORNE      <- 'retorne' FimNome -> noKwRetorne
   ENTRADA      <- {'leia'} FimNome
   SAIDA        <- {'escreva'} FimNome
   TEXTOCOMP    <- {'textoComp'} FimNome

@@ -6,9 +6,10 @@ local TipoTag = defs.TipoTag
 local TipoBasico = defs.TipoBasico
 local Tag = defs.Tag
 
-local avaliaNovoArrayExp, avaliaExpChamada
+local avaliaNovoArrayExp, avaliaExpChamada, decVar
 local getVarArrayRef
 local execBlocoFuncao
+local valRetorno, auxRetorno, tagRetorno = nil, nil, nil
 
 local function avalia (exp, ambiente)
 	assert(ambiente ~= nil)
@@ -115,22 +116,26 @@ function avaliaExpChamadaAux (exp, ambiente)
 		t[#t + 1] = s
 	end
 
-	error("Falta terminar")
-	local f = tab.getValor(exp, ambiente)
+	local f = tab.getValor(exp.nome, ambiente)
 	local params = f.params
 
 	tab.entraBloco(ambiente)
 
-	for i, v in ipairs(params) do
+	for i, v in ipairs(params.lista) do
 		if v.tag == Tag.decVar then
 			decVar(v, ambiente, t[i])
+		elseif v.tag == Tag.decArrayVar then
+			tab.insereSimbolo(v, nil, ambiente, v.tipo.dim)
+			local ref = tab.getValor(v, ambiente)
+			tab.setValor(ref, t[i])	
 		else
-			error("Falta tratar parâmetros do tipo array")
+			error("Desconhecido")
 		end
 	end
 	
-	execBlocoFuncao(exp.tbloco, ambiente)
+	execBlocoFuncao(f.tbloco, ambiente) --atualiza 'valRetorno'
 	tab.saiBloco(ambiente)
+	return valRetorno, auxRetorno
 end
 
 
@@ -210,16 +215,33 @@ function getVarArrayRef (v, i, t, ambiente, linha)
 end
 
 local function decArrayVar (v, ambiente)
-	local nexp, t
-	if v.exp then
-		nexp, t = avaliaNovoArrayExp(v.exp, ambiente)
-		--print("nexp, t", nexp, t)
+	if not v.exp then
+		tab.insereSimbolo(v, nil, ambiente, v.tipo.dim)	
+	else
+		if v.exp.tag == Tag.expChamada then
+			local nexp, t = avalia(v.exp, ambiente)
+			if tagRetorno == Tag.expNovoArray then
+				tab.insereSimbolo(v, nexp, ambiente, v.tipo.dim, t)
+			else
+				tab.insereSimbolo(v, nil, ambiente, v.tipo.dim)
+				local ref = tab.getValor(v, ambiente)
+				tab.setValor(ref, nexp)	
+			end	 
+		elseif v.exp.tag == Tag.expNovoArray then 
+			local nexp, t = avalia(v.exp, ambiente)
+			tab.insereSimbolo(v, nexp, ambiente, v.tipo.dim, t)
+		elseif v.exp.tag == Tag.expSimpVar or v.exp.tag == Tag.expArrayVar then
+			tab.insereSimbolo(v, nil, ambiente, v.tipo.dim)
+			local ref = tab.getValor(v, ambiente)
+			local x = avalia(v.exp, ambiente)
+			tab.setValor(ref, x)	
+		else --??
+			error("decArrayVar: inicialiação não implementada")
+		end
 	end
-	--print("decArrayVar", v, v.v, v.tipo, v.tipo.tag, v.tipo.dim, v.exp, nexp, t)
-	tab.insereSimbolo(v, nexp, ambiente, v.tipo.dim, t)	
 end
 
-local function decVar (v, ambiente, aux)
+function decVar (v, ambiente, aux)
 	local exp
 	if v.exp then
 		exp = avalia(v.exp, ambiente)
@@ -244,7 +266,6 @@ local function decVarLista (dec, ambiente)
 end
 
 local function decFuncao (decf, ambiente)
-	print("ambietne", #ambiente)
 	tab.insereSimbolo(decf, nil, ambiente)
 end
 
@@ -320,6 +341,9 @@ local function execCmd (c, ambiente)
 		execCmdRepita(c, ambiente)
 	elseif c.tag == Tag.cmdChamada then
 		execChamada(c, ambiente)
+	elseif c.tag == Tag.cmdRetorne then
+		valRetorno, auxRetorno = avalia(c.exp, ambiente)
+		tagRetorno = c.exp.tag
 	else
 		error("Comando desconhecido")
 	end

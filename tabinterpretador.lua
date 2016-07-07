@@ -57,7 +57,6 @@ local function insereSimbolo (var, valor, ambiente, dim, t)
 		end
 	elseif var.tag == Tag.decFuncao then
 		local nome = var.v.v
-		print(var.tag, var.v, var.v.v)
 		ambiente[n][nome] = { tipo = var.tipo, dim = var.dim,
                           params = var.params, tbloco = var.tbloco, func = true  }
 		--error("Inserindo funcao " .. nome)	

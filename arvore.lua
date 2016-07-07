@@ -250,7 +250,7 @@ end
 -- TODO: repensar o tipo de uma função: só simples? simples e array?
 local function noChamadaFunc (f, ...)
 	return { tag = Tag.expChamada, tipo = makeTipo(TipoTag.naoTipado, TipoBasico.naotipado),
-           nome = f, args = { ... }, ehExp = true, linha = defs.linha } 
+           nome = f, args = { ... }, ehExp = true, linha = f.linha } 
 end
 
 local function noCmdChamada (t)
@@ -267,14 +267,16 @@ local function noCmdRepita (e, b)
 	return { tag = Tag.cmdRepita, exp = e, bloco = b, linha = defs.linha }
 end
 
-local function noCmdRetorne (e)
+local function noCmdRetorne (k, e)
 	if e == "" then --TODO: rever o parser: uma Exp sempre casa
 		e = nil 
 	end
-	return { tag = Tag.cmdRetorne, exp = e, linha = defs.linha }
+	return { tag = Tag.cmdRetorne, exp = e, linha = k.linha }
 end
 
-
+local function noKwRetorne (k)
+	return { linha = defs.linha }
+end
 
 local function noCmdSenaoSe (...)
 	local t = { ... }
@@ -370,8 +372,13 @@ local function noListaParam (...)
 	while i + 1 <= n do
     --print("j = ", j, t[i].v, t[i+1].v)
 		lista[j] = {}
-		lista[j].tag = Tag.decVar
-		lista[j].tipo = t[i]
+		local tipo = t[i]
+		if tipo.tag == TipoTag.array then
+			lista[j].tag = Tag.decArrayVar
+		else
+			lista[j].tag = Tag.decVar
+		end
+		lista[j].tipo = tipo
 		lista[j].linha = t[i].linha
 		lista[j].v = t[i+1].v
 		i = i + 2		
@@ -404,6 +411,7 @@ return {
   noChamadaFunc = noChamadaFunc,
   noCmdChamada = noCmdChamada,
   noCmdRetorne = noCmdRetorne,
+  noKwRetorne = noKwRetorne,
 	noDecVarL = noDecVarL,
 	noListaParam = noListaParam,
 	noDecVar = noDecVar,
