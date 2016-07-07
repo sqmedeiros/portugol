@@ -13,7 +13,7 @@ se a > 2
 		inteiro a = 0
 		a = a - 1
 	fim
-	bool a = falso
+	booleano a = falso
 fim
 
 inteiro c = 8

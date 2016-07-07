@@ -57,7 +57,8 @@ local function getToken (s)
 end
 
 local function getTipoBasico(t)
-  assert(TipoBasico[t], t)
+ 	if t == "booleano" then t = "bool" end
+	 assert(TipoBasico[t], t)
 	return TipoBasico[t]
 end
 

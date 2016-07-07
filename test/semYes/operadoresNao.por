@@ -1,6 +1,6 @@
 inteiro a = 1
 numero b = 3.4
-bool c1 = falso, c2 = verdadeiro
+booleano c1 = falso, c2 = verdadeiro
 texto t = "alex"
 
 repita enquanto a > 0

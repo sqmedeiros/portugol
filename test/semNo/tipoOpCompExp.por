@@ -1,5 +1,5 @@
 inteiro a, b
-bool x
+booleano x
 
 a = a > b
 a = a >= b

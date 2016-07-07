@@ -6,7 +6,7 @@ a[3] = -5
 a[4] = 15
 a[5] = 4
 
-bool repete = falso
+booleano repete = falso
 inteiro i = 1
 repita enquanto i <= 5
 	inteiro j = i + 1

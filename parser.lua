@@ -165,7 +165,7 @@ local g = re.compile([[
   INTEIRO      <- 'inteiro' -> getTipoBasico FimNome
   NUMERO       <- 'numero' -> getTipoBasico FimNome 
   TEXTO        <- 'texto' -> getTipoBasico FimNome
-  BOOLEANO     <- 'bool' -> getTipoBasico FimNome
+  BOOLEANO     <- 'booleano' -> getTipoBasico FimNome
   MOD          <- 'mod' -> getToken FimNome
   E            <- 'e' -> getToken FimNome
   OU           <- 'ou' -> getToken FimNome

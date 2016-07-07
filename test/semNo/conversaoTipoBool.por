@@ -1,4 +1,4 @@
-bool a = 3
+booleano a = 3
 
 a = 3.0
 

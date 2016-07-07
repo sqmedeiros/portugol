@@ -4,7 +4,7 @@ inteiro b = 22
 
 texto c = "bola"
 
-bool d, f = verdadeiro
+booleano d, f = verdadeiro
 
 a = false
 

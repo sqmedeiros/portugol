@@ -1,4 +1,4 @@
-bool b = falso e verdadeiro
+booleano b = falso e verdadeiro
 
 b = nao b
 

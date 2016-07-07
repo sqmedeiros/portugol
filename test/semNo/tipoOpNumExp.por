@@ -20,7 +20,7 @@ x = y * 2.0
 x = x / y
 x = x mod y
 
-bool b1, b2
+booleano b1, b2
 b1 = b1 + b2
 b1 = b1 - b2
 b1 = b1 * b2

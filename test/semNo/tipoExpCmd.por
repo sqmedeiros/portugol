@@ -27,7 +27,7 @@ repita enquanto t
 	a = a + 1
 fim
 
-bool b
+booleano b
 repita enquanto b
 	a = a + 1
 fim
