@@ -138,12 +138,23 @@ function avaliaExpChamadaAux (exp, ambiente)
 	return valRetorno, auxRetorno
 end
 
+local function mytostring(v)
+	if v == true then
+		return "verdadeiro"
+	elseif v == false then
+		return "falso"
+	else
+		return tostring(v)
+	end
+end
+
 
 function avaliaExpChamada (exp, ambiente)
 	if exp.nome.v == "escreva" then
 		for i, v in ipairs(exp.args) do
 			local e1 = avalia(v, ambiente)
-			io.write(tostring(e1), " ")
+			local s1 = mytostring(e1)
+			io.write(s1, " ")
 		end
 		io.write("\n")
 	elseif exp.nome.v == "leia" then

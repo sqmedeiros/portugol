@@ -35,6 +35,7 @@ newError("erroFechaPar", "caractere ')' esperado")
 newError("erroFechaCol", "caractere ']' esperado")
 newError("erroAbreCol", "caractere '[' esperado")
 newError("erroNovoExpArray", "erro ao inicializar array")
+newError("erroTipoRetorna", "nome de tipo esperado após 'retorna'")
 newError("erroIndefinido", "indefinido")
 
 
@@ -101,7 +102,7 @@ local g = re.compile([[
   BlocoExt     <- (DecFunc / DecVar / Comando)* -> noBloco
   BlocoInt     <- (DecVar / Comando)* -> noBloco
   DecFunc      <- (FUNCAO (Nome / ErroDecNomeFun) ABREPAR ListaParam FECHAPAR RetornaDec? BlocoInt FunFim) -> noDecFuncao
-	RetornaDec   <- RETORNA Tipo
+	RetornaDec   <- RETORNA (Tipo / ErroTipoRetorna)
   DecVar       <- (Tipo (DecVarAtrib (VIRG DecVarAtrib)*)) -> noDecVarL
   ListaParam   <- (Tipo (Nome / ErroDecNome) (VIRG (Tipo / ErroTipoVirg) (Nome / ErroDecNome))*)? -> noListaParam
   DecVarAtrib  <- ((Nome / ErroDecNome) (ATRIB (Exp / ErroExpAtrib))?) -> noDecVar
@@ -209,6 +210,7 @@ local g = re.compile([[
 	ErroFechaCol   <- ErrCount %{erroFechaCol}
 	ErroAbreCol    <- ErrCount %{erroAbreCol}
 	ErroNovoExpArray <- ErrCount %{erroNovoExpArray}
+	ErroTipoRetorna <- ErrCount %{erroTipoRetorna}
 	ErroFuncPredef <- ErrCount %{erroFuncPredef}
 	ErroIndefinido <- ErrCount %{erroIndefinido}
 	ErroAtrib      <- ErrCount %{erroAtrib}

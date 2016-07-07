@@ -29,6 +29,8 @@ end
 
 local function equalString (s1, s2)
 	s1 = string.gsub(s1, "[ \t]", "")
+	s1 = string.gsub(s1, "verdadeiro", "true")
+	s1 = string.gsub(s1, "falso", "false")
 	s2 = string.gsub(s2, "[ \t]", "")
 	return s1 == s2
 end
