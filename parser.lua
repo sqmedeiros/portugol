@@ -57,41 +57,16 @@ for k, v in ipairs(terror) do
 	labelCode[v.l] = k
 end
 
+
 local predef = { ["countLine"] = countLine,
                  ["incLinha"] = incLinha,
-                 ["noExp"] = arvore.noExp,
-                 ["noNaoExp"] = arvore.noNaoExp,
-                 ["noMenosUnario"] = arvore.noMenosUnario,
-                 ["noId"] = arvore.noId,
-                 ["noInteiro"] = arvore.noInteiro,
-                 ["noReal"] = arvore.noReal,
-                 ["noTexto"] = arvore.noTexto,
-                 ["noBoolFalso"] = arvore.noBoolFalso,
-                 ["noBoolVerd"] = arvore.noBoolVerd,
-                 ["noOpNumExp"] = arvore.noOpNumExp,
-								 ["noOpCompExp"] = arvore.noOpCompExp,
-								 ["noOpBoolExp"] = arvore.noOpBoolExp,
-								 ["noCmdAtrib"] = arvore.noCmdAtrib,
-								 ["noCmdRepita"] = arvore.noCmdRepita,
-								 ["noCmdSe"] = arvore.noCmdSe,
-								 ["noCmdSenaoSe"] = arvore.noCmdSenaoSe,
-								 ["noChamadaFunc"] = arvore.noChamadaFunc,
-								 ["noCmdChamada"] = arvore.noCmdChamada,
-								 ["noCmdRetorne"] = arvore.noCmdRetorne,
-								 ["noKwRetorne"] = arvore.noKwRetorne,
-								 ["noDecVarL"] = arvore.noDecVarL,
-								 ["noListaParam"] = arvore.noListaParam,
-								 ["noDecVar"] = arvore.noDecVar,
-								 ["noDecFuncao"] = arvore.noDecFuncao,
-								 ["noDecArrayVar"] = arvore.noDecArrayVar,
-								 ["noBloco"] = arvore.noBloco,
-								 ["noNovoArrayExp"] = arvore.noNovoArrayExp,
-								 ["noTipo"] = arvore.noTipo,	
-								 ["noVar"] = arvore.noVar	
+								 ["getToken"] = defs.getToken,
+                 ["getTipoBasico"] = defs.getTipoBasico
 }
 
-predef["getToken"] = defs.getToken
-predef["getTipoBasico"] = defs.getTipoBasico
+for k, v in pairs(arvore) do
+	predef[k] = v
+end
 
 re.setlabels(labelCode)
 
