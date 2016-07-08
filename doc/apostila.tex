@@ -1,0 +1,166 @@
+\documentclass{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{xspace}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{epsfig}
+
+\begin{document}
+
+\thispagestyle{empty}
+\begin{center}
+
+\begin{center}
+%\tt{LabLua}\\
+%\tt{www.lua.inf.puc-rio.br}
+\end{center}
+\vspace{6cm}
+\Huge{Lógica de Programação}\\
+\vspace{1.5cm}
+\Large{Sérgio Queiroz de Medeiros} \\
+\Large{Escola de Ciências e Tecnologia} \\
+\Large{UFRN}
+\vspace{5cm}
+\\
+\large{Julho de 2016}
+\end{center}
+
+\tableofcontents
+
+\pagebreak
+
+%\textbf{\huge{Prefácio}}
+
+%\vspace{1cm}
+
+
+
+\chapter{Introdução}
+
+\section{Tipos Básicos}
+
+\begin{itemize}
+	\item \textbf{booleano}
+	\item \textbf{inteiro}
+	\item \textbf{numero}
+	\item \textbf{texto}
+\end{itemize}
+
+
+\section{Declaração de Array}
+
+A forma geral para declarar um array é a seguinte: 
+\begin{verbatim}
+nomeDoTipo[] identificador
+\end{verbatim}
+
+No exemplo acima, apenas declaramos um array, mas não o
+inicializamos. Abaixo declaramos e inicializamos um
+array de inteiros com 10 elementos:
+\begin{verbatim}
+inteiro[] x = novo inteiro[10]
+\end{verbatim}
+
+O primeiro elemento de $x$ está no índice 1 o último
+elemento no índice 10. É um erro acessar um índice do
+array fora desse intervalo. Abaixo temos o exemplo de
+um programa que inicializa cada posição $i$ de um array
+com o $i^2$ e imprime o resultado:
+\begin{verbatim}
+inteiro[] a
+
+a = novo inteiro[5]
+
+inteiro i = 1
+repita enquanto i <= 5
+  a[i] = i * i
+  i = i + 1
+fim
+
+i = 1
+repita enquanto i <= 5
+  escreva(a[i])
+  i = i + 1
+fim
+\end{verbatim}
+
+
+Devemos usar um par de \texttt{[]} para declarar cada dimensão
+do nosso array, como mostrado abaixo: 
+\begin{verbatim}
+inteiro[][] x = novo inteiro[5][3]
+\end{verbatim}
+
+A expressão \texttt{novo inteiro[5][3]} diz que $x$ é um
+array que possui 5 elementos na primeira dimensão, e cada
+uma desses elementos possui 3 elementos na segunda dimensão.
+
+
+\section{Funções Básicas}
+
+\begin{itemize}
+	\item \textbf{escreva (parâmetro1, parâmetro2, ..., parâmetroN)}
+	
+	\item \textbf{leia(parâmetro1, parâmetro2, ..., parâmetroN)}
+	
+	\item \textbf{inteiro textoComp (texto s)}: retorna o comprimento do texto $s$
+	
+	\item \textbf{texto textoSub (texto s, inteiro inicio, inteiro fim)}:
+	retorna a porção do texto $s$ que começa no índice $inicio$ e termina
+  no índice $fim$. O índice $fim$ é opcional, se ele não for fornecido a
+  porção do texto $s$ retornada começa em $inicio$ e vai até o fim de $s$.
+	
+	\item \textbf{texto textoPos (texto s, inteiro inicio)}:
+	retorna o texto no índice $inicio$ de $s$
+\end{itemize}
+
+
+\section{Declaração de Função}
+
+Forma geral de declarar uma função: \\
+\textbf{funcao} nomeFuncao (tipo1 nome1, ..., tipoN nomeN) \textbf{retorna} tipoRetorno
+
+Caso a função não retorne nenhum valor, a última parte não é necessária e a
+função pode ser declarada como: \\
+\textbf{funcao} nomeFuncao (tipo1 nome1, ..., tipoN nomeN)
+
+
+Na figura~\ref{fig:perfeito} temos o exemplo de uma função que
+determina se um dado número é perfeito ou não. Um número inteiro
+$x$ é perfeito se ele é igual à soma dos seus divisores, excetuando-se
+ele mesmo. 
+
+\begin{figure}
+\begin{verbatim}
+funcao ehPerfeito (inteiro x) retorna booleano
+  inteiro soma = 1
+  inteiro divisor = 2
+  repita enquanto divisor <= x / 2
+    se x mod divisor == 0
+      soma = soma + divisor
+    fim
+    divisor = divisor + 1
+  fim	
+
+  retorne soma == x
+fim
+
+escreva(ehPerfeito(6))
+escreva(ehPerfeito(9))
+escreva(ehPerfeito(28))
+escreva(ehPerfeito(1000))
+\end{verbatim}
+\caption{Função que Determina se um Número é Perfeito}
+\label{fig:perfeito}
+\end{figure}
+
+\end{document}
+
+
