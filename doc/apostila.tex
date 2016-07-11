@@ -11,6 +11,9 @@
 \usepackage{amsfonts}
 \usepackage{amsthm}
 \usepackage{epsfig}
+\usepackage{url}
+
+\newcommand{\Egol}{ECTGol}
 
 \begin{document}
 
@@ -41,8 +44,120 @@
 %\vspace{1cm}
 
 
-
 \chapter{Introdução}
+
+Em um curso como Lógica de Programação, onde o aluno
+vai começar o aprendizado de algoritmos e de programção
+de computadores, é comum a utilização de uma linguagem
+de programação que possa facilitar o entendimento do
+assunto, ao invés de usar linguagens de programação
+mais convencionais.
+
+Geralmente uma linguagem de programação utiliza termos em inglês,
+de modo que ela possa ser usada por pessoas de todo o mundo.
+Contudo, o uso de termos em inglês pode dificultar o aprendizado
+de alguns alunos. Por conta disso, algumas linguagens, voltadas
+principalmente para o aprendizado de programação, usam termos em
+português. Essas linguagens são usualmente chamadas de \emph{Portugol}.
+
+Neste curso utilizaremos a linguagem de programação \emph{\Egol},
+cuja sintaxe foi inspirada na sintaxe da linguagem Quorum
+(\url{https://www.quorumlanguage.com/}).
+
+Com \Egol será possível implementarmos algoritmos que envolvam
+estruturas de decisão, estruturas de repetição, coleções de dados
+e funções.
+
+Para executarmos os programas escritos em \Egol é necessário
+instalar o ambiente de programação da linguagem, que está disponível em
+\url{https://github.com/alex7alves/InterfaacePesquisa}.
+
+
+\section{Programa \emph{Olá, mundo}}
+
+Abaixo temos o nosso primeiro programa \Egol:
+%
+\begin{verbatim}
+escreva("Olá, mundo")
+\end{verbatim}
+%
+No programa acima usamos a função \texttt{escreva},
+que recebe um valor e o imprime para a saída padrão
+do computador (o monitor, geralmente). Nesse programa
+\texttt{escreva} recebeu um texto entre aspas duplas.
+Quando executado, esse programa imprime o texto \emph{Olá, mundo}.  
+
+Escreva o programa acima no ambiente de programação de \Egol,
+salve o arquivo como \texttt{alo.gol} e tente executá-lo.
+Use sempre a extensão \texttt{.gol} para os arquivos com
+programas \Egol.
+
+A função \texttt{escreva} não imprime só texto, ela também
+imprime valores inteiros e outros tipos de dados que veremos
+mais adiante. Por exemplo, no programa a seguir a função
+\texttt{escreva} recebe dois valores, um texto e o valor
+inteiro 42:
+%
+\begin{verbatim}
+escreva("A resposta é ", 42)
+\end{verbatim}
+%
+Note que usamos uma vírgula para separar os
+valores passados para a função \texttt{escreva}.
+
+
+\section{Variáveis}
+
+Vamos agora escrever um programa que pede para o usuário
+digitar dois valores inteiros, calcula a soma desses valores
+e imprime o resultado.
+
+Abaixo, temos o programa \texttt{somaInteiro.gol}, que
+calcula a soma de valores inteiros digitados pelo usuário:
+%
+\begin{verbatim}
+01  inteiro valor1, valor2, soma
+02
+03  escreva("Digite um valor inteiro: ")
+04  leia(valor1)
+05
+06  escreva("Digite outro valor inteiro: ")
+07  leia(valor2)
+08
+09  soma = valor1 + valor2
+10  escreva("A soma deu ", soma)
+\end{verbatim}
+%
+Na linha 1 declaramos as variáveis \texttt{valor1}, \texttt{valor2}
+e \texttt{soma}, do tipo \textbf{inteiro}. Uma variável é um nome associado
+a uma região da memória do computador. Podemos usar esse nome para
+acessar e alterar o valor armazenado nessa região de memória. Em \Egol
+toda variável possui um tipo, que indica a natureza dos valores que
+iremos armazenar naquela variável. No acima, o tipo \textbf{inteiro}
+indica que iremos guardar valores inteiros na variáveis
+\texttt{valor1}, \texttt{valor2} e \texttt{soma}, tais como
+42, -255, 0 e 1000000. 
+
+Na linha 3, usamos a função \texttt{escreva}, que vimos anteriormente,
+para pedir que o usuário forneça um valor inteiro.
+
+Usamos a função \texttt{leia} na linha 4 para ler a informação digitada
+pelo usuário e armazená-la na região de memória associada à variável
+\texttt{valor1}. De modo similar, na linha 7 usamos \texttt{leia}
+para guardar na variável\texttt{valor2} o segundo valor inteiro
+digitado pelo usuário.
+
+
+Na linha 9 declaramos e inicializamos a variável \texttt{soma},
+também do tipo \textbf{inteiro}. Para atribuir um valor a uma
+variável usamos o operador \texttt{=}.
+
+
+
+Na linha 1 declaramos duas variáveis inteiras
+\texttt{valor} e \texttt{valor21
+
+
 
 \section{Tipos Básicos}
 
@@ -52,6 +167,12 @@
 	\item \textbf{numero}
 	\item \textbf{texto}
 \end{itemize}
+
+
+
+\section{Exercícios}
+
+
 
 
 \section{Declaração de Array}
