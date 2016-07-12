@@ -251,9 +251,9 @@ local function geraCpp (arqEntrada, arqSaida)
 end
 
 local function compila (arqEntrada)
-	local t, v = teste(arqEntrada)
+	local t, v, serror = teste(arqEntrada)
 	if not t then
-		imprimeErro(t, v)
+		imprimeErro(t, v, serror)
 		prog = nil
 		return nil
 	end
