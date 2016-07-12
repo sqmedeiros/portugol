@@ -210,6 +210,9 @@ local function imprimeErro(n, e, serror)
 	end
 end
 
+-- programa pronto para ser interpretado
+local prog
+
 local function parse(s)
   defs.linha = 1
 	return g:match(s)
@@ -235,51 +238,62 @@ local function teste (nome)
 	return parse(s)
 end
 
-local function compila (arqEntrada, arqSaida)
+
+local function geraCpp (arqEntrada, arqSaida)
+	if not compila(arqEntrada) then
+		return
+	end
+	local prog = gerador.geraPrograma(t)
+	arqSaida = arqSaida or "tmp.cpp"
+	local saida = io.open(arqSaida, "w")
+	saida:write(prog)
+	saida:close()
+end
+
+local function compila (arqEntrada)
 	local t, v = teste(arqEntrada)
 	if not t then
 		imprimeErro(t, v)
-	else
-  	semantica.analisaPrograma(t)
-		local terro = erro.getErros()
-		if #terro > 0 then
-			for i, v in ipairs(terro) do
-				print(v)
-			end
-		else
-			local prog = gerador.geraPrograma(t)
-			arqSaida = arqSaida or "tmp.cpp"
-			local saida = io.open(arqSaida, "w")
-			saida:write(prog)
-			saida:close()
-		end
+		prog = nil
+		return nil
 	end
+  semantica.analisaPrograma(t)
+	local terro = erro.getErros()
+	if #terro > 0 then
+		for i, v in ipairs(terro) do
+			print(v)
+		end
+		prog = nil
+		return nil
+	end
+	prog = t
+	return t
 end
 
+
+-- compila e executa um programa
 local function interpreta (arqEntrada)
-	local t, v, serror = teste(arqEntrada)
-	if not t then
-		imprimeErro(t, v, serror)
-	else
-  	semantica.analisaPrograma(t)
-		local terro = erro.getErros()
-		if #terro > 0 then
-			for i, v in ipairs(terro) do
-				print(v)
-			end
-		else
-			interpretador.executa(t)
-		end
+	if not compila(arqEntrada) then
+		return
 	end
+	interpretador.executa(prog)
 end
 
+
+-- executa um programa já compilado
+local function executa ()
+	if not prog then
+		print("Erro: programa não compilado")	
+	end
+	interpretador.executa(prog)
+end
 
 return {
 	parse = parse,
 	parse2 = parse2,
   imprimeErro = imprimeErro,
 	compila = compila,
-	interpreta = interpreta
+	interpreta = interpreta,
+	executa = executa,
 }
-
 

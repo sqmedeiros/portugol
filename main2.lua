@@ -1,3 +1,5 @@
 local parser = require 'parser'
 
-parser.interpreta(arg[1])
+if parser.compila(arg[1]) then
+	parser.executa()
+end
