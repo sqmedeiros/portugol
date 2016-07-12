@@ -13,7 +13,7 @@
 \usepackage{epsfig}
 \usepackage{url}
 
-\newcommand{\Egol}{ECTGol}
+\newcommand{\Egol}{ECTGol\;}
 
 \begin{document}
 
@@ -82,10 +82,10 @@ escreva("Olá, mundo")
 \end{verbatim}
 %
 No programa acima usamos a função \texttt{escreva},
-que recebe um valor e o imprime para a saída padrão
-do computador (o monitor, geralmente). Nesse programa
-\texttt{escreva} recebeu um texto entre aspas duplas.
-Quando executado, esse programa imprime o texto \emph{Olá, mundo}.  
+que recebe um valor entre parênteses e o imprime para
+a saída padrão do computador (o monitor, geralmente).
+Nesse programa \texttt{escreva} recebeu um texto entre aspas
+duplas. Quando executado, esse programa imprime \emph{Olá, mundo}.  
 
 Escreva o programa acima no ambiente de programação de \Egol,
 salve o arquivo como \texttt{alo.gol} e tente executá-lo.
@@ -104,6 +104,37 @@ escreva("A resposta é ", 42)
 %
 Note que usamos uma vírgula para separar os
 valores passados para a função \texttt{escreva}.
+
+
+\section{Fazendo contas}
+
+Podemos usar \Egol como uma calculadora, onde a função
+\texttt{escreva} irá imprimir o resultado de uma determinada
+expressão, como no exemplo abaixo:
+%
+\begin{verbatim}
+escreva("A resposta é ", 1 + 1)
+\end{verbatim}
+%
+Nesse exemplo, a expressão \texttt{1 + 1} terá seu valor
+calculado e então esse valor será exibido. Podemos calcular
+também o resultado de expressões mais complexas:
+\begin{verbatim}
+escreva("A resposta é ", 3 + 4 * 5)
+\end{verbatim}
+% 
+Nesse caso, como o operador \textbf{*} possui maior precedência
+a multiplicação \texttt{4 * 5} será realizada primeiro e o seu
+resultado será somado ao valor 3.
+%
+Para mudar a ordem em que as operações devem ser feitas podemos
+usar parênteses, como no exemplo a seguir:
+\begin{verbatim}
+escreva("Usando parênteses ", (3 + 4) * 5, (5 + 7)  / (3 - 1))
+\end{verbatim}
+%
+Esse programa deve imprimir os valores 35 e 6 como resultado
+das operações de multiplicação e divisão, respectivamente.
 
 
 \section{Variáveis}
@@ -133,11 +164,11 @@ e \texttt{soma}, do tipo \textbf{inteiro}. Uma variável é um nome associado
 a uma região da memória do computador. Podemos usar esse nome para
 acessar e alterar o valor armazenado nessa região de memória. Em \Egol
 toda variável possui um tipo, que indica a natureza dos valores que
-iremos armazenar naquela variável. No acima, o tipo \textbf{inteiro}
-indica que iremos guardar valores inteiros na variáveis
-\texttt{valor1}, \texttt{valor2} e \texttt{soma}, tais como
-42, -255, 0 e 1000000. 
-
+iremos armazenar naquela variável, e deve ser declarada antes de
+ser usada. No exemplo acima, o tipo \textbf{inteiro} indica
+que iremos guardar valores inteiros, tais como 42, -255, 0 e 1000000,
+nas variáveis \texttt{valor1}, \texttt{valor2} e \texttt{soma}.
+ 
 Na linha 3, usamos a função \texttt{escreva}, que vimos anteriormente,
 para pedir que o usuário forneça um valor inteiro.
 
@@ -147,26 +178,101 @@ pelo usuário e armazená-la na região de memória associada à variável
 para guardar na variável\texttt{valor2} o segundo valor inteiro
 digitado pelo usuário.
 
+Na linha 9, usamos o operador de atribuição \textbf{=} para guardar
+na variável \texttt{soma} o resultado da operação \texttt{valor1 + valor2},
+que é um valor inteiro. Mais adiante iremos estudar a precedência dos
+operadores, que determina que operações serão realizadas primeiro.
+No casa da linha 9, primeiro será realizada a operação \textbf{+} (soma)
+e depois a operação \textbf{=} (atribuição).
 
-Na linha 9 declaramos e inicializamos a variável \texttt{soma},
-também do tipo \textbf{inteiro}. Para atribuir um valor a uma
-variável usamos o operador \texttt{=}.
+Em seguida, na linha 10, imprimimos um texto seguido do valor armazenado
+em \texttt{soma}. 
+
+Digite o programa \Egol acima no seu ambiente de programação
+e depois o execute. Em seguida, modifique o programa de modo que
+ele imprima também o valor da subtração \texttt{valor1 - valor2}.
 
 
+\section{Operadores Aritméticos e o Tipo \textbf{numero}}
 
-Na linha 1 declaramos duas variáveis inteiras
-\texttt{valor} e \texttt{valor21
 
+Abaixo listamos os operadores aritméticos disponíveis em \Egol,
+todos possuem dois operandos:
+\begin{verbatim}
++   -   *   /   mod
+\end{verbatim}
+
+
+O operador \textbf{/} calcula o resultado da divisão entre dois valores
+$x$ e $y$. Se $x$ e $y$ são valores inteiros, então o resultado será um
+valor inteiro. Por exemplo, a expressão abaixo:
+\begin{verbatim}
+12 / 5
+\end{verbatim}
+produzirá o valor 2.
+
+Se um dos valores for um número real, como por exemplo 3.14\footnote{Note que devemos
+o ponto ao invés da vírgula para separar a parte inteira da parte fracionária}, então
+o resultado será um número real. Por exemplo, a expressão:
+\begin{verbatim}
+12 / 5.0
+\end{verbatim}
+produzirá o valor 2.4.
+
+Para armazenar um valor real, devemos usar uma variável do tipo
+\textbf{numero}, como mostrado no exemplo abaixo:
+\begin{verbatim}
+01  numero x = 12 / 5
+02  escreva("x = ", x)
+03
+04  x = 12 / 5.0
+05  escreva("x = ", x)
+\end{verbatim}
+%
+Na linha 1 declaramos a variável \texttt{x} e a inicializamos
+com o valor da expressão \texttt{12 / 5}. Na linha 2 imprimimos
+o valor de \texttt{x}, no caso 2. Note que uma variável do tipo
+\textbf{numero} também pode guardar valores inteiros, porém uma
+variável do tipo \textbf{inteiro} não pode guardar valores reais.
+
+Na linha 4, atribuímos a \texttt{x} o valor da expressão \texttt{12 / 5.0}
+e na linha 5 imprimimos o novo valor de \texttt{x}.
+
+% TODO: falar da função de conversão entre inteiros e reais
+
+Enquanto o operador \textbf{/} nos dá o resultado do quociente
+de uma divisão, o opererador \textbf{mod} nos dá o resto de uma
+divisão. Por exemplo, o resultado da expressão
+\begin{verbatim}
+14 mod 2
+\end{verbatim}
+é 4, que representa o resto da divisão de 14 por 2.
+
+Ao contrário dos outros operadores aritméticos, que aceitam
+valores reais e inteiros, o operador \textbf{mod} somente pode
+ser aplicado a operandos inteiros. 
+
+
+\section{Tipos Básicos}
 
 
 \section{Tipos Básicos}
 
 \begin{itemize}
-	\item \textbf{booleano}
-	\item \textbf{inteiro}
-	\item \textbf{numero}
-	\item \textbf{texto}
+	\item \textbf{booleano}: representa os valores \textbf{verdadeiro} e \textbf{falso}
+	\item \textbf{inteiro}: representa valores inteiros, como 101, -93 e 0.
+	\item \textbf{numero}: representa valores valores reais, como 3.14, -10.4, e 42.0
+	\item \textbf{texto}: representa sequências de caracteres, que deve estar entre
+  aspas duplas, tais como "bola" e "ciclo básico"
 \end{itemize}
+
+
+
+
+
+\chapter{Estruturas de Controle}
+
+\chapter{Estruturas de Repetição}
 
 
 
