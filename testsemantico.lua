@@ -11,7 +11,7 @@ local function isValid (f)
 	if string.match(f, "[.]swp") then
 		return false
 	end
-	if string.sub(f, #f-3) == ".por" then
+	if string.sub(f, #f-3) == ".gol" then
 		return true
 	end
 	return false
@@ -45,7 +45,7 @@ function execFile (nome, dir)
 	--executa arquivo portugol
 	local nome = string.sub(nome, 1, #nome - 4)
 	local prefixo = dir .. "/" .. nome
-	local cmd = "lua main2.lua " .. prefixo .. ".por"
+	local cmd = "lua main2.lua " .. prefixo .. ".gol"
 	local inCmd = ""
 	if io.open(prefixo .. ".in") then -- arquivo de entrada associado
 		inCmd = " < " .. prefixo .. ".in "
@@ -87,30 +87,30 @@ function makeTeste (arquivos, dir)
 	end
 end
 
-novoTeste("decVar.por", 1)
-novoTeste("erroRedeclaracao.por", 5)
-novoTeste("erroNaoDec.por", 4)
-novoTeste("conversaoTipoInt.por", 8)
-novoTeste("conversaoTipoNum.por", 3)
-novoTeste("conversaoTipoTexto.por", 4)
-novoTeste("conversaoTipoBool.por", 3)
-novoTeste("tipoOpNumExp.por", 10)
-novoTeste("tipoOpBoolExp.por", 5)
-novoTeste("tipoOpCompExp.por", 6)
-novoTeste("tipoExpCmd.por", 7)
-novoTeste("blocoVazio.por", 1)
-novoTeste("erroPrecOpNao.por", 4) -- antes era 2, mas acho que 4 faz mais sentido
+novoTeste("decVar.gol", 1)
+novoTeste("erroRedeclaracao.gol", 5)
+novoTeste("erroNaoDec.gol", 4)
+novoTeste("conversaoTipoInt.gol", 8)
+novoTeste("conversaoTipoNum.gol", 3)
+novoTeste("conversaoTipoTexto.gol", 4)
+novoTeste("conversaoTipoBool.gol", 3)
+novoTeste("tipoOpNumExp.gol", 10)
+novoTeste("tipoOpBoolExp.gol", 5)
+novoTeste("tipoOpCompExp.gol", 6)
+novoTeste("tipoExpCmd.gol", 7)
+novoTeste("blocoVazio.gol", 1)
+novoTeste("erroPrecOpNao.gol", 4) -- antes era 2, mas acho que 4 faz mais sentido
                                   -- erro ao aplicar "nao" a um inteiro, e erro
                                   -- de comparar um valor bool com um inteiro
-novoTeste("erroArrayDec.por", 7)
-novoTeste("erroArray1.por", 6)
-novoTeste("erroArrayOpBin.por", 9)
-novoTeste("erroTextoComp.por", 5)
-novoTeste("erroTextoSub.por", 10)
-novoTeste("erroTextoPos.por", 8)
-novoTeste("funcaoSoma.por", 16)
-novoTeste("funcaoArray.por", 4)
-novoTeste("funcaoArray2.por", 6)
+novoTeste("erroArrayDec.gol", 7)
+novoTeste("erroArray1.gol", 6)
+novoTeste("erroArrayOpBin.gol", 9)
+novoTeste("erroTextoComp.gol", 5)
+novoTeste("erroTextoSub.gol", 10)
+novoTeste("erroTextoPos.gol", 8)
+novoTeste("funcaoSoma.gol", 16)
+novoTeste("funcaoArray.gol", 4)
+novoTeste("funcaoArray2.gol", 6)
 
 local dir = "./test/semNo"
 makeTeste(arqTeste, dir)
