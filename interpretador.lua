@@ -197,6 +197,10 @@ function avaliaExpChamada (exp, ambiente)
 		exp.nome.v = "textoSub"
 		exp.args[3] = exp.args[2]
 		return avaliaExpChamada(exp, ambiente)
+	elseif exp.nome.v == "converteInt" then
+		local v = exp.args[1]
+		local s = avalia(v, ambiente)
+		return math.tointeger(s)
 	else
 		return avaliaExpChamadaAux(exp, ambiente)
 	end			

@@ -111,6 +111,7 @@ novoTeste("erroTextoPos.gol", 8)
 novoTeste("funcaoSoma.gol", 16)
 novoTeste("funcaoArray.gol", 4)
 novoTeste("funcaoArray2.gol", 6)
+novoTeste("converteInt.gol", 3)
 
 local dir = "./test/semNo"
 makeTeste(arqTeste, dir)

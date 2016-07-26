@@ -107,7 +107,7 @@ local g = re.compile([[
                   ABREPAR  (Exp / ErroExpPar)  (FECHAPAR / ErroFechaPar)  /
                   ChamadaFunc / Numero  / Var  / Cadeia / VERDADEIRO / FALSO
   ChamadaFunc  <- ((FuncPredef -> noId (ABREPAR / ErroFuncPredef) / Nome ABREPAR) ListaExp (FECHAPAR / ErroFechaPar)) -> noChamadaFunc
-  FuncPredef   <- ENTRADA / SAIDA / TEXTOCOMP / TEXTOSUB / TEXTOPOS
+  FuncPredef   <- ENTRADA / SAIDA / TEXTOCOMP / TEXTOSUB / TEXTOPOS / CONVINT
   ListaExp     <- (Exp (VIRG (Exp / ErroExpVirg))*)*
   Var          <- (Nome (ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol))*) -> noVar
   Nome         <- !RESERVADA {LETRA RestoNome*} -> noId Sp
@@ -136,6 +136,7 @@ local g = re.compile([[
   TEXTOCOMP    <- {'textoComp'} FimNome
   TEXTOSUB     <- {'textoSub'} FimNome
   TEXTOPOS     <- {'textoPos'} FimNome
+  CONVINT      <- {'converteInt'} FimNome
   REPITA       <- 'repita' FimNome
   ENQUANTO     <- 'enquanto' FimNome
   INTEIRO      <- 'inteiro' -> getTipoBasico FimNome

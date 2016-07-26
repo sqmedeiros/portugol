@@ -1,0 +1,9 @@
+numero x = 8.0
+
+escreva(converteInt(3 + 4.2))
+
+escreva(converteInt(4.5 + 4.5))
+
+escreva(converteInt(x))
+
+escreva(converteInt(44))

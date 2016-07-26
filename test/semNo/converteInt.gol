@@ -1,0 +1,16 @@
+inteiro x
+
+x = converteInt(3)
+
+x = converteInt(3.0)
+
+//Erro
+escreva(converteInt("3.0"))
+
+//Erro
+escreva(converteInt(verdadeiro))
+
+escreva(converteInt(3.0 + 4.2))
+
+//Erro
+escreva(converteInt(3.0 + 4.2, 3))

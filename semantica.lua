@@ -324,6 +324,17 @@ function analisaExpChamada (exp, ambiente)
 			end
 		end	
 		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.texto)
+	elseif exp.nome.v == "converteInt" then
+		if #exp.args ~= 1 then
+			erro("função converteInt espera 1 parâmetro, mas foi chamada com " .. #exp.args, exp.nome.linha)
+			return
+		end
+		local v1 = exp.args[1]	
+		analisaExp(v1, ambiente)
+		if (v1.tipo.basico ~= TipoBasico.inteiro and v1.tipo.basico ~= TipoBasico.numero) or not ehValorBasico(v1, ambiente) then
+			erro("função converteInt espera parâmetro do tipo 'numero' ou 'inteiro'", v1.linha)
+		end
+		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.inteiro)
 	else
 		analisaExpChamadaAux(exp, ambiente)
 	end
