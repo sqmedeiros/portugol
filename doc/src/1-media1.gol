@@ -1,0 +1,7 @@
+inteiro idade1, idade2
+
+escreva("Digite a idade de duas pessoas: ")
+leia(idade1, idade2)
+
+inteiro media = (idade1 + idade2) / 2
+escreva("A média das idades foi ", media)

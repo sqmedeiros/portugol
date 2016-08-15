@@ -367,12 +367,39 @@ Por fim, na linha 10, imprimimos o valor da temperatura nas duas escalas.
 Se fornecermos como entrada do programa a temperatura prevista para hoje em Natal,
 que é de 29\degree C, ele mostrará o valor correspondente de 58.6\degree F.
 
-Se por alguma razão dejarmos mostrar somente valores inteiros, podemos usar a função
-\texttt{converteInt}, que converte um número para inteiro. Assim, a última linha do
-programa anterior seria reescrita como:
+
+\section{Exercícios}
+
+\begin{enumerate}
+
+\item Considere que um caixa de supermercado possui notas de R\$ 50,
+R\$ 20, R\$ 10, R\$ 5 e R\$ 1. Escreva um programa que lê um valor
+inteiro, que representa o troco que o caixa deve dar, e calcula o
+menor número de notas que o caixa deve utilizar para obter esse valor.
+O programa deve mostrar o número de notas de cada valor que serão
+utilizados para fornecer o troco.
+\begin{itemize}
+	\item Exemplo de entrada:
 \begin{verbatim}
-escreva(tempC, "C  equivalem a ", converteInt(tempF), "F")
+87
 \end{verbatim}
+	\item Exemplo de saída:
+\begin{verbatim}
+1 nota(s) de R$ 50
+1 nota(s) de R$ 20
+1 nota(s) de R$ 10
+1 nota(s) de R$  5
+2 nota(s) de R$  1
+\end{verbatim}
+\end{itemize}
+
+\end{enumerate}
+
+
+
+\section{Tipos Básicos e Expressões Lógicas}
+
+
 
 \begin{itemize}
 	\item \textbf{booleano}: representa os valores \textbf{verdadeiro} e \textbf{falso}
@@ -389,23 +416,7 @@ escreva(tempC, "C  equivalem a ", converteInt(tempF), "F")
 % TODO: falar da função de conversão entre inteiros e reais
 
 
-\section{Exercícios}
 
-\begin{enumerate}
-
-\item Considere que um caixa de supermercado possui notas de R\$ 50,
-R\$ 20, R\$ 10, R\$ 5 e R\$ 1. Escreva um programa que lê um valor
-inteiro, que representa o troco que o caixa deve dar, e calcula o
-menor número de notas que o caixa deve utilizar para obter esse valor.
-O programa deve mostrar o número de notas de cada valor que serão
-utilizados para fornecer o troco.
-
-\begin{verbatim}
-
-\end{verbatim}
-
-
-\end{enumerate}
 
 
 \chapter{Estruturas de Controle}

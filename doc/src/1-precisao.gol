@@ -1,0 +1,5 @@
+escreva(1234 + 1)        //1235
+escreva(15400 + 1)       //15401
+escreva(2147483647 + 1)  //Provavelmente imprime  2147483648
+escreva(9223372036854775807 + 1)  //Provavelmente imprime -9223372036854775808
+
