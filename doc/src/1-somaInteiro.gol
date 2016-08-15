@@ -1,0 +1,10 @@
+inteiro valor1, valor2, soma
+
+escreva("Digite um valor inteiro: ")
+leia(valor1)
+
+escreva("Digite outro valor inteiro: ")
+leia(valor2)
+
+soma = valor1 + valor2
+escreva("A soma deu ", soma)

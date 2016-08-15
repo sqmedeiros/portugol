@@ -1,0 +1,7 @@
+numero x = 12 / 5
+escreva("x = ", x)
+
+x = 12 / 5.0
+escreva("x = ", x)
+
+escreva(1 % 2)

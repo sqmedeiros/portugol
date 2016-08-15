@@ -12,8 +12,9 @@
 \usepackage{amsthm}
 \usepackage{epsfig}
 \usepackage{url}
+\usepackage{gensymb}
 
-\newcommand{\Egol}{ECTGol\;}
+\newcommand{\Qgol}{QuoGol\;}
 
 \begin{document}
 
@@ -32,7 +33,7 @@
 \Large{UFRN}
 \vspace{5cm}
 \\
-\large{Julho de 2016}
+\large{Agosto de 2016}
 \end{center}
 
 \tableofcontents
@@ -60,22 +61,23 @@ de alguns alunos. Por conta disso, algumas linguagens, voltadas
 principalmente para o aprendizado de programação, usam termos em
 português. Essas linguagens são usualmente chamadas de \emph{Portugol}.
 
-Neste curso utilizaremos a linguagem de programação \emph{\Egol},
+Neste curso utilizaremos a linguagem de programação \emph{\Qgol},
 cuja sintaxe foi inspirada na sintaxe da linguagem Quorum
 (\url{https://www.quorumlanguage.com/}).
 
-Com \Egol será possível implementarmos algoritmos que envolvam
+Com \Qgol será possível implementarmos algoritmos que envolvam
 estruturas de decisão, estruturas de repetição, coleções de dados
 e funções.
 
-Para executarmos os programas escritos em \Egol é necessário
+Para executarmos os programas escritos em \Qgol é necessário
 instalar o ambiente de programação da linguagem, que está disponível em
-\url{https://github.com/alex7alves/InterfaacePesquisa}.
+\url{https://github.com/alex7alves/InterfaacePesquisa/tree/master/pesquisa}.
 
 
 \section{Programa \emph{Olá, mundo}}
 
-Abaixo temos o nosso primeiro programa \Egol:
+Vamos começar o nosso aprendizado com um programa \Qgol simples,
+que imprime um texto:
 %
 \begin{verbatim}
 escreva("Olá, mundo")
@@ -84,13 +86,14 @@ escreva("Olá, mundo")
 No programa acima usamos a função \texttt{escreva},
 que recebe um valor entre parênteses e o imprime para
 a saída padrão do computador (o monitor, geralmente).
-Nesse programa \texttt{escreva} recebeu um texto entre aspas
-duplas. Quando executado, esse programa imprime \emph{Olá, mundo}.  
+Nesse programa o valor recebido por \texttt{escreva}
+foi um texto, delimitado por aspas duplas. Quando executado,
+esse programa imprime \emph{Olá, mundo}.  
 
-Escreva o programa acima no ambiente de programação de \Egol,
+Escreva o programa acima no ambiente de programação de \Qgol,
 salve o arquivo como \texttt{alo.gol} e tente executá-lo.
 Use sempre a extensão \texttt{.gol} para os arquivos com
-programas \Egol.
+programas \Qgol.
 
 A função \texttt{escreva} não imprime só texto, ela também
 imprime valores inteiros e outros tipos de dados que veremos
@@ -108,7 +111,7 @@ valores passados para a função \texttt{escreva}.
 
 \section{Fazendo contas}
 
-Podemos usar \Egol como uma calculadora, onde a função
+Podemos usar \Qgol como uma calculadora, onde a função
 \texttt{escreva} irá imprimir o resultado de uma determinada
 expressão, como no exemplo abaixo:
 %
@@ -139,9 +142,14 @@ das operações de multiplicação e divisão, respectivamente.
 
 \section{Variáveis}
 
-Vamos agora escrever um programa que pede para o usuário
-digitar dois valores inteiros, calcula a soma desses valores
-e imprime o resultado.
+Nos programas anteriores, fizemos operações com valores que
+já estavam definidos nos próprios programas (os números $3$, $7$, etc).
+Agora vamos escrever um programa que vai pedir para o usuário
+digitar valores e então vai fazer operações sobre esses valores.
+
+Para isso, precisamos usar variáveis. Uma variável é um nome associado
+a uma região da memória do computador. Podemos usar esse nome para
+acessar e alterar o valor armazenado nessa região de memória. 
 
 Abaixo, temos o programa \texttt{somaInteiro.gol}, que
 calcula a soma de valores inteiros digitados pelo usuário:
@@ -160,12 +168,10 @@ calcula a soma de valores inteiros digitados pelo usuário:
 \end{verbatim}
 %
 Na linha 1 declaramos as variáveis \texttt{valor1}, \texttt{valor2}
-e \texttt{soma}, do tipo \textbf{inteiro}. Uma variável é um nome associado
-a uma região da memória do computador. Podemos usar esse nome para
-acessar e alterar o valor armazenado nessa região de memória. Em \Egol
+e \texttt{soma}, do tipo \textbf{inteiro}. Em \Qgol
 toda variável possui um tipo, que indica a natureza dos valores que
-iremos armazenar naquela variável, e deve ser declarada antes de
-ser usada. No exemplo acima, o tipo \textbf{inteiro} indica
+iremos armazenar naquela variável e esse tipo deve ser declarado antes
+da variável ser usada. No exemplo acima, o tipo \textbf{inteiro} indica
 que iremos guardar valores inteiros, tais como 42, -255, 0 e 1000000,
 nas variáveis \texttt{valor1}, \texttt{valor2} e \texttt{soma}.
  
@@ -182,21 +188,21 @@ Na linha 9, usamos o operador de atribuição \textbf{=} para guardar
 na variável \texttt{soma} o resultado da operação \texttt{valor1 + valor2},
 que é um valor inteiro. Mais adiante iremos estudar a precedência dos
 operadores, que determina que operações serão realizadas primeiro.
-No casa da linha 9, primeiro será realizada a operação \textbf{+} (soma)
+No caso da linha 9, primeiro será realizada a operação \textbf{+} (soma)
 e depois a operação \textbf{=} (atribuição).
 
 Em seguida, na linha 10, imprimimos um texto seguido do valor armazenado
 em \texttt{soma}. 
 
-Digite o programa \Egol acima no seu ambiente de programação
+Digite o programa \Qgol acima no seu ambiente de programação
 e depois o execute. Em seguida, modifique o programa de modo que
 ele imprima também o valor da subtração \texttt{valor1 - valor2}.
 
 
+
 \section{Operadores Aritméticos e o Tipo \textbf{numero}}
 
-
-Abaixo listamos os operadores aritméticos disponíveis em \Egol,
+Abaixo listamos os operadores aritméticos disponíveis em \Qgol,
 todos possuem dois operandos:
 \begin{verbatim}
 +   -   *   /   mod
@@ -212,8 +218,8 @@ valor inteiro. Por exemplo, a expressão abaixo:
 produzirá o valor 2.
 
 Se um dos valores for um número real, como por exemplo 3.14\footnote{Note que devemos
-o ponto ao invés da vírgula para separar a parte inteira da parte fracionária}, então
-o resultado será um número real. Por exemplo, a expressão:
+usar o ponto ao invés da vírgula para separar a parte inteira da parte fracionária de número},
+então o resultado será um número real. Por exemplo, a expressão:
 \begin{verbatim}
 12 / 5.0
 \end{verbatim}
@@ -238,25 +244,135 @@ variável do tipo \textbf{inteiro} não pode guardar valores reais.
 Na linha 4, atribuímos a \texttt{x} o valor da expressão \texttt{12 / 5.0}
 e na linha 5 imprimimos o novo valor de \texttt{x}.
 
-% TODO: falar da função de conversão entre inteiros e reais
-
 Enquanto o operador \textbf{/} nos dá o resultado do quociente
 de uma divisão, o opererador \textbf{mod} nos dá o resto de uma
 divisão. Por exemplo, o resultado da expressão
 \begin{verbatim}
-14 mod 2
+14 mod 5
 \end{verbatim}
-é 4, que representa o resto da divisão de 14 por 2.
+é 4, que representa o resto da divisão de 14 por 5.
 
 Ao contrário dos outros operadores aritméticos, que aceitam
 valores reais e inteiros, o operador \textbf{mod} somente pode
 ser aplicado a operandos inteiros. 
 
+O operador \textbf{mod} é bastante útil se desejamos saber se
+um número é ou não divisível por outro. Quando um número é divisível
+por outro o resultado do operador \textbf{mod} é zero.
 
-\section{Tipos Básicos}
+Abaixo, temos uma adaptação do nosso programa que somava dois números
+inteiros. Agora, ele imprime o resto da divisão de \texttt{x} por \texttt{y}:
+%
+\begin{verbatim}
+01  inteiro x, y, resto
+02  
+03  escreva("Digite dois valores inteiros: ")
+04  leia(x, y)
+05 
+06  resto = x mod y
+07  escreva(x,  " mod ",  y, " = ", resto)
+\end{verbatim}
+
+Na linha 1 declaramos as variáveis inteiras
+\texttt{x}, \texttt{y} e \texttt{resto}, e na
+linha 4 fizemos a leitura dos valores de
+\texttt{x} e \texttt{y}.
+
+Na linha 6, inicializamos a variável \texttt{resto}
+como o resto da divisão de \texttt{x} por \texttt{y},
+e na linha 7 imprimimos o resultado.
 
 
-\section{Tipos Básicos}
+Embora no exemplo anterior tenhamos utilizado a variável
+\texttt{resto} para guardar o resultado da operação de \textbf{mod}
+também é possível imprimir diretamente o resultado dessa operação,
+como mostrado a seguir:
+\begin{verbatim}
+01  inteiro x, y
+02  
+03  escreva("Digite dois valores inteiros: ")
+04  leia(x, y)
+05 
+06  escreva(x,  " mod ",  y, " = ", x mod y)
+\end{verbatim}
+
+
+\section{Conversão de Temperaturas}
+
+Dado que sabemos como realizas operações aritméticas em \Qgol,
+podemos escrever um programa que converte temperaturas. Em todo o
+mundo as temperaturas são medidas na escala Celsius, porém nos
+Estados Unidos ainda usam uma escala diferente, e medem a temperatura
+em graus Fahrenheit. 
+
+A nossa tarefa é fazer um programa que convete uma temperatura em
+graus Celsius (ou centígrados) para Fahrenheit.
+
+Não adianta tentar escrever um programa para isso se não sabemos
+como converter uma temperatura entre essas duas escalas.
+
+Na escala Celsius a água congela a 0\degree e ferve a 100\degree C,
+enquanto que na escala Fahrenheit ela congela a 32\degree
+e ferve a 212\degree F.
+
+Com isso, podemos definir uma regra de conversão entre essas escalas
+da seguinte maneira, onde \texttt{C} representa uma temperatura qualquer
+em graus Celsius e \texttt{F} representa uma temperatura qualquer em
+graus Fahrenheit:
+\[
+\frac{F-32}{212-32} = \frac{C-0}{100-0}  \;\;\Rightarrow\;\;  \frac{F-32}{180}  =  \frac{C}{100}
+\]
+Podemos dividir ambos os lados da igualdade por 20 e então obter a equação:
+\[
+\frac{F-32}{9} = \frac{C}{5}  \;\;\Rightarrow\;\;  F = \frac{9*C + 32}{5}
+\]
+
+Agora que sabemos como converter uma temperatura na escala Celsius para a
+correspondente na escala Fahrenheit podemos escrever o nosso programa \Qgol,
+que está listado na figura~\ref{fig:celsius}:
+
+\begin{figure}
+\begin{verbatim}
+01  //Programa que converte de Celsius para Fahrenheit
+02
+03  numero tempC, tempF
+04
+05  escreva("Digite uma temperatura em graus Celsius: ")
+06  leia(tempC)
+07
+08  tempF = (tempC * 9 + 32) / 5
+09
+10  escreva(tempC, "C  equivalem a ", tempF, "F")
+\end{verbatim}
+\caption{Programa que converte uma temperatura em graus Celsius para Fahrenheit}
+\label{fig:celsius}
+\end{figure}
+
+Na linha 1 do programa temos um comentário de uma linha. Um comentário é indicado
+por \texttt{//} e não faz parte da lógica do programa, é apenas uma informação para
+o programador, muitas vezes usado para explicar o que faz um certo trecho de código.
+O texto de um comentário é ignorado pelo compilador ao gerar um arquivo executável.
+
+Na linha 3 declaramos as variáveis \texttt{tempC} e \texttt{tempF} para armazenar
+os valores das temperaturas em graus Celsius e Fahrenheit, respectivamente. Note
+que elas são do tipo \texttt{numero}, não do tipo \texttt{inteiro}, pois podemos
+representar uma temperatura como um valor real.
+
+Na linha 6 inicializamos a variável \texttt{tempC} com o valor fornecido pelo usuário.
+Em seguida, na linha 8, convertemos a temperatura para Fahrenheit de acordo com a
+equação mostrada anteriormente.
+
+Por fim, na linha 10, imprimimos o valor da temperatura nas duas escalas.
+
+Se fornecermos como entrada do programa a temperatura prevista para hoje em Natal,
+que é de 29\degree C, ele mostrará o valor correspondente de 58.6\degree F.
+
+Se por alguma razão dejarmos mostrar somente valores inteiros, podemos usar a função
+\texttt{converteInt}, que converte um número para inteiro. Assim, a última linha do
+programa anterior seria reescrita como:
+\begin{verbatim}
+escreva(tempC, "C  equivalem a ", converteInt(tempF), "F")
+\end{verbatim}
 
 \begin{itemize}
 	\item \textbf{booleano}: representa os valores \textbf{verdadeiro} e \textbf{falso}
@@ -268,6 +384,28 @@ ser aplicado a operandos inteiros.
 
 
 
+
+
+% TODO: falar da função de conversão entre inteiros e reais
+
+
+\section{Exercícios}
+
+\begin{enumerate}
+
+\item Considere que um caixa de supermercado possui notas de R\$ 50,
+R\$ 20, R\$ 10, R\$ 5 e R\$ 1. Escreva um programa que lê um valor
+inteiro, que representa o troco que o caixa deve dar, e calcula o
+menor número de notas que o caixa deve utilizar para obter esse valor.
+O programa deve mostrar o número de notas de cada valor que serão
+utilizados para fornecer o troco.
+
+\begin{verbatim}
+
+\end{verbatim}
+
+
+\end{enumerate}
 
 
 \chapter{Estruturas de Controle}

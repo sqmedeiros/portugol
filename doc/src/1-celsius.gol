@@ -1,0 +1,10 @@
+//Programa que converte de Celsius para Fahrenheit
+
+numero tempC, tempF
+
+escreva("Digite uma temperatura em graus Celsius: ")
+leia(tempC)
+
+tempF = (tempC * 9 + 32) / 5
+
+escreva(tempC, "C  equivalem a ", tempF, "F")
