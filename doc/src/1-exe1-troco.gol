@@ -1,0 +1,12 @@
+inteiro troco
+
+escreva("Digite o troco a ser dado: ")
+leia(troco)
+
+inteiro nota50, nota20, nota10, nota5, nota1
+
+nota50 = troco / 50
+troco = nota % 50
+nota20 = troco / 20
+nota10 = troco / 10
+

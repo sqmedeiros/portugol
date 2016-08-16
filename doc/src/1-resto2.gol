@@ -3,4 +3,5 @@ inteiro x, y
 escreva("Digite dois valores inteiros: ")
 leia(x, y)
  
-escreva(x,  " mod ",  y, " = ", x mod y)
+inteiro resto = x mod y
+escreva(x,  " divisível por ",  y, "? ", resto == 0)

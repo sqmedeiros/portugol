@@ -12,7 +12,8 @@
 \usepackage{amsthm}
 \usepackage{epsfig}
 \usepackage{url}
-\usepackage{gensymb}
+\usepackage{gensymb}   %comando \degree
+\usepackage{verbatim}  %para comentar de múltiplas linhas
 
 \newcommand{\Qgol}{QuoGol\;}
 
@@ -200,10 +201,10 @@ ele imprima também o valor da subtração \texttt{valor1 - valor2}.
 
 
 
-\section{Operadores Aritméticos e o Tipo \textbf{numero}}
+\section{Operadores Aritméticos}
 
 Abaixo listamos os operadores aritméticos disponíveis em \Qgol,
-todos possuem dois operandos:
+os quais são todos operadores binários:
 \begin{verbatim}
 +   -   *   /   mod
 \end{verbatim}
@@ -260,52 +261,56 @@ O operador \textbf{mod} é bastante útil se desejamos saber se
 um número é ou não divisível por outro. Quando um número é divisível
 por outro o resultado do operador \textbf{mod} é zero.
 
-Abaixo, temos uma adaptação do nosso programa que somava dois números
-inteiros. Agora, ele imprime o resto da divisão de \texttt{x} por \texttt{y}:
+Abaixo, temos um programa que lê dois números inteiros \texttt{x} e \texttt{y}
+e imprime \texttt{verdadeiro} se \texttt{x} é divisível por \texttt{y}, e
+\textbf{falso} caso contrário:
 %
-\begin{verbatim}
-01  inteiro x, y, resto
-02  
-03  escreva("Digite dois valores inteiros: ")
-04  leia(x, y)
-05 
-06  resto = x mod y
-07  escreva(x,  " mod ",  y, " = ", resto)
-\end{verbatim}
-
-Na linha 1 declaramos as variáveis inteiras
-\texttt{x}, \texttt{y} e \texttt{resto}, e na
-linha 4 fizemos a leitura dos valores de
-\texttt{x} e \texttt{y}.
-
-Na linha 6, inicializamos a variável \texttt{resto}
-como o resto da divisão de \texttt{x} por \texttt{y},
-e na linha 7 imprimimos o resultado.
-
-
-Embora no exemplo anterior tenhamos utilizado a variável
-\texttt{resto} para guardar o resultado da operação de \textbf{mod}
-também é possível imprimir diretamente o resultado dessa operação,
-como mostrado a seguir:
 \begin{verbatim}
 01  inteiro x, y
 02  
 03  escreva("Digite dois valores inteiros: ")
 04  leia(x, y)
 05 
-06  escreva(x,  " mod ",  y, " = ", x mod y)
+06  inteiro resto = x mod y
+07  escreva(x,  " divisível por ",  y, "? ", resto == 0)
 \end{verbatim}
+
+Na linha 1 declaramos as variáveis inteiras \texttt{x}, \texttt{y},
+e na linha 4 fazemos a leitura dos valores de \texttt{x} e \texttt{y}.
+
+Em seguida, na linha 6, declaramos e inicializamos a variável \texttt{resto}
+como o resto da divisão de \texttt{x} por \texttt{y}. Na linha 7 usamos o
+operador de igualdade \textbf{==}. A expressão \texttt{resto == 0} produzirá
+um valor verdadeiro quando a variável \texttt{resto} for igual a zero, e produzirá
+um valor falso quando o resto for diferente de zero. 
+
+Note que no programa anterior não guardamos o resultado da expressão
+\texttt{resto == 0} em uma variável, ao invés disso imprimimos diretamente
+o valor dessa expressão. Claro que também poderíamos guardar o valor dessa
+expressão em uma variável, e então imprimir o valor dessa variável. Nesse
+caso, precisaríamos de uma uma variável do tipo \textbf{booleano}. A seguir
+listamos os tipos disponíveis em \Qgol e qual informação podemos armazenar
+em uma variável de cada tipo.
+
+\begin{itemize}
+	\item \textbf{booleano}: representa os valores \textbf{verdadeiro} e \textbf{falso}
+	\item \textbf{inteiro}: representa valores inteiros, como 101, -93 e 0
+	\item \textbf{numero}: representa valores reais, como 3.14, -10.4, e 42.0
+	\item \textbf{texto}: representa sequências de caracteres, que devem estar entre
+  aspas duplas, tais como "bola" e "ciclo básico"
+\end{itemize}
+
 
 
 \section{Conversão de Temperaturas}
 
-Dado que sabemos como realizas operações aritméticas em \Qgol,
+Dado que sabemos como realizar operações aritméticas em \Qgol,
 podemos escrever um programa que converte temperaturas. Em todo o
-mundo as temperaturas são medidas na escala Celsius, porém nos
+mundo as temperaturas são medidas na escala Celsius, porém os
 Estados Unidos ainda usam uma escala diferente, e medem a temperatura
 em graus Fahrenheit. 
 
-A nossa tarefa é fazer um programa que convete uma temperatura em
+A nossa tarefa é fazer um programa que converte uma temperatura em
 graus Celsius (ou centígrados) para Fahrenheit.
 
 Não adianta tentar escrever um programa para isso se não sabemos
@@ -372,6 +377,41 @@ que é de 29\degree C, ele mostrará o valor correspondente de 58.6\degree F.
 
 \begin{enumerate}
 
+
+\item Escreva um programa que converte um valor em dólares
+	para o valor correspondente em reais. O seu programa deve
+	ler a quantidade de dólares que se deseja converter, a taxa
+	de conversão, e então imprimir o valor equivalente em reais.
+\begin{itemize}
+	\item Exemplo de entrada:
+\begin{verbatim}
+100 3.5
+\end{verbatim}
+	\item Exemplo de saída:
+\begin{verbatim}
+U$$ 100 equivalem a R$ 350 
+\end{verbatim}
+\end{itemize}
+
+
+\item Escreva um programa que dada uma quantidade $S$ de
+	segundos calcula e imprime a quantidade correspondente
+	de horas, minutos e segundos.
+\begin{itemize}
+	\item Exemplos de entrada:
+\begin{verbatim}
+201
+3670
+\end{verbatim}
+	\item Exemplos de saída:
+\begin{verbatim}
+O hora(s), 3 minuto(s) e 21 segundo(s) 
+1 hora(s), 1 minuto(s) e 10 segundo(s)
+\end{verbatim}
+\end{itemize}
+
+
+\begin{comment}
 \item Considere que um caixa de supermercado possui notas de R\$ 50,
 R\$ 20, R\$ 10, R\$ 5 e R\$ 1. Escreva um programa que lê um valor
 inteiro, que representa o troco que o caixa deve dar, e calcula o
@@ -392,25 +432,78 @@ utilizados para fornecer o troco.
 2 nota(s) de R$  1
 \end{verbatim}
 \end{itemize}
-
+\end{comment}
 \end{enumerate}
 
 
 
-\section{Tipos Básicos e Expressões Lógicas}
+\section{Operadores Relacionais e Lógicos}
 
+Além dos operadores aritméticos, em \Qgol também temos operadores
+relacionais e lógicos.
 
+Já vimos um exemplo de operador relacional, o operador de igualdade
+\textbf{==}. Todos os operadores de igualdade possuem dois operandos
+e produzem os valores \textbf{verdadeiro} ou \textbf{falso}. Abaixo
+listamos todos os operadores relacionais, onde \textbf{nao=} é o
+operador de negação da igualdade:
+\begin{verbatim}
+==   nao=   <   >   <=   >=
+\end{verbatim}
 
-\begin{itemize}
-	\item \textbf{booleano}: representa os valores \textbf{verdadeiro} e \textbf{falso}
-	\item \textbf{inteiro}: representa valores inteiros, como 101, -93 e 0.
-	\item \textbf{numero}: representa valores valores reais, como 3.14, -10.4, e 42.0
-	\item \textbf{texto}: representa sequências de caracteres, que deve estar entre
-  aspas duplas, tais como "bola" e "ciclo básico"
-\end{itemize}
+Podemos aplicar os operadores \textbf{==} e \textbf{nao=} a qualquer
+tipo de valor (e.g., inteiro, real, booleano, texto). Os operadores
+de ordem {\bf }, {\bf <}, {\bf <=} e {\bf >=} podem ser aplicados
+a valores inteiros, reais e textuais, mas não podem ser aplicados
+a valores booleanos. 
 
+Para manipular valores booleanos devemos usar os operadores lógicos.
+Abaixo listamos os operadores lógicos de \Qgol, onde o operarador
+de conjunção (\textbf{e}) e o operador de disjunção (\textbf{ou})
+são operadores binários, enquanto que o operador de negação (\textbf{nao})
+é unário:
+\begin{verbatim}
+e   ou   nao
+\end{verbatim}
 
+Sejam \texttt{exp1} e \texttt{exp2} duas expressões booleanas (isto é,
+duas expressões cujo valor é verdadeiro ou falso), o operador \textbf{e}
+somente produzirá um valor verdadeiro quando ambas as expressões forem
+verdadeiras. Podemos ver a tabela verdade para esse operador na
+figura~\ref{tab:ope}.
 
+\begin{figure}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+exp1 & exp2 & exp1 {\bf e} exp2 \\ \hline
+falso & falso & falso \\ \hline
+falso & verdadeiro & falso \\ \hline
+verdadeiro & falso & falso \\ \hline
+verdadeiro & verdadeiro & verdadeiro \\ \hline
+\end{tabular}
+\label{tab:ope}
+\caption{Tabela verdade para o operador lógico {\bf e} (conjunção)}
+\end{figure}
+
+Já a aplicação do operador \textbf{ou} resultará em um
+valor verdadeiro quando uma das expressões for verdadeira,
+como podemos ver na figura~\ref{tab:opou}, que apresenta
+a tabela verdade correspondente a esse operador.
+
+\begin{figure}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+exp1 & exp2 & exp1 {\bf ou} exp2 \\ \hline
+falso & falso & falso \\ \hline
+falso & verdadeiro & verdadeiro \\ \hline
+verdadeiro & falso & verdadeiro \\ \hline
+verdadeiro & verdadeiro & verdadeiro \\ \hline
+\end{tabular}
+\label{tab:opou}
+\caption{Tabela verdade para o operador lógico {\bf ou} (disjunção)}
+\end{figure}
 
 
 % TODO: falar da função de conversão entre inteiros e reais
