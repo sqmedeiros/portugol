@@ -1,0 +1,9 @@
+inteiro ano
+
+escreva("Digite um ano: ")
+leia(ano)
+
+booleano div4 = (ano mod 4 == 0) e nao (ano mod 100 == 0)
+booleano div400 = ano mod 400 == 0
+
+escreva("Bissexto = ", div4 ou div400) 
