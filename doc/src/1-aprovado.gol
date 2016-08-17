@@ -1,0 +1,12 @@
+numero nota1, nota2
+
+escreva("Digite a nota da primeira avaliação: ")
+leia(nota1)
+
+escreva("Digite a nota da segunda avaliação: ")
+leia(nota2)
+
+booleano resultado
+resultado = (nota1 >= 7.0 ou nota2 >= 7.0) e nao (nota1 < 3.0) e nao (nota2 < 3.0)
+
+escreva("Aprovado? ", resultado) 

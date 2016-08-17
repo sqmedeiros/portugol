@@ -37,7 +37,7 @@
 \large{Agosto de 2016}
 \end{center}
 
-\tableofcontents
+%\tableofcontents
 
 \pagebreak
 
@@ -49,7 +49,7 @@
 \chapter{Introdução}
 
 Em um curso como Lógica de Programação, onde o aluno
-vai começar o aprendizado de algoritmos e de programção
+vai começar o aprendizado de algoritmos e de programação
 de computadores, é comum a utilização de uma linguagem
 de programação que possa facilitar o entendimento do
 assunto, ao invés de usar linguagens de programação
@@ -72,7 +72,7 @@ e funções.
 
 Para executarmos os programas escritos em \Qgol é necessário
 instalar o ambiente de programação da linguagem, que está disponível em
-\url{https://github.com/alex7alves/InterfaacePesquisa/tree/master/pesquisa}.
+\url{https://github.com/alex7alves/Setup-QuoGol-IDE}.
 
 
 \section{Programa \emph{Olá, mundo}}
@@ -143,12 +143,13 @@ das operações de multiplicação e divisão, respectivamente.
 
 \section{Variáveis}
 
-Nos programas anteriores, fizemos operações com valores que
-já estavam definidos nos próprios programas (os números $3$, $7$, etc).
+Nos programas anteriores fizemos operações com literais, isto é,
+valores que já estavam definidos no próprio programa (os números $3$, $7$, etc).
 Agora vamos escrever um programa que vai pedir para o usuário
 digitar valores e então vai fazer operações sobre esses valores.
 
-Para isso, precisamos usar variáveis. Uma variável é um nome associado
+Esse programa requer que as informações digitadas pelo usuário sejam
+armazenadas e para isso vamos usar variáveis. Uma variável é um nome associado
 a uma região da memória do computador. Podemos usar esse nome para
 acessar e alterar o valor armazenado nessa região de memória. 
 
@@ -171,10 +172,12 @@ calcula a soma de valores inteiros digitados pelo usuário:
 Na linha 1 declaramos as variáveis \texttt{valor1}, \texttt{valor2}
 e \texttt{soma}, do tipo \textbf{inteiro}. Em \Qgol
 toda variável possui um tipo, que indica a natureza dos valores que
-iremos armazenar naquela variável e esse tipo deve ser declarado antes
-da variável ser usada. No exemplo acima, o tipo \textbf{inteiro} indica
+iremos armazenar naquela variável. No exemplo acima, o tipo \textbf{inteiro} indica
 que iremos guardar valores inteiros, tais como 42, -255, 0 e 1000000,
 nas variáveis \texttt{valor1}, \texttt{valor2} e \texttt{soma}.
+
+Toda variável deve ser declarada antes de ser usada. Para declarar
+uma variável devemos informar o tipo e o nome da variável.
  
 Na linha 3, usamos a função \texttt{escreva}, que vimos anteriormente,
 para pedir que o usuário forneça um valor inteiro.
@@ -219,7 +222,7 @@ valor inteiro. Por exemplo, a expressão abaixo:
 produzirá o valor 2.
 
 Se um dos valores for um número real, como por exemplo 3.14\footnote{Note que devemos
-usar o ponto ao invés da vírgula para separar a parte inteira da parte fracionária de número},
+usar o ponto ao invés da vírgula para separar a parte inteira da parte fracionária de um número.},
 então o resultado será um número real. Por exemplo, a expressão:
 \begin{verbatim}
 12 / 5.0
@@ -281,16 +284,16 @@ e na linha 4 fazemos a leitura dos valores de \texttt{x} e \texttt{y}.
 Em seguida, na linha 6, declaramos e inicializamos a variável \texttt{resto}
 como o resto da divisão de \texttt{x} por \texttt{y}. Na linha 7 usamos o
 operador de igualdade \textbf{==}. A expressão \texttt{resto == 0} produzirá
-um valor verdadeiro quando a variável \texttt{resto} for igual a zero, e produzirá
-um valor falso quando o resto for diferente de zero. 
+um valor booleano, isto é, um valor verdadeiro (quando \texttt{resto} for igual a zero)
+ou falso (quando \texttt{resto} for diferente de zero). 
 
 Note que no programa anterior não guardamos o resultado da expressão
 \texttt{resto == 0} em uma variável, ao invés disso imprimimos diretamente
 o valor dessa expressão. Claro que também poderíamos guardar o valor dessa
 expressão em uma variável, e então imprimir o valor dessa variável. Nesse
-caso, precisaríamos de uma uma variável do tipo \textbf{booleano}. A seguir
+caso, precisaríamos usar uma variável do tipo \textbf{booleano}. A seguir
 listamos os tipos disponíveis em \Qgol e qual informação podemos armazenar
-em uma variável de cada tipo.
+em uma variável de cada tipo:
 
 \begin{itemize}
 	\item \textbf{booleano}: representa os valores \textbf{verdadeiro} e \textbf{falso}
@@ -300,6 +303,7 @@ em uma variável de cada tipo.
   aspas duplas, tais como "bola" e "ciclo básico"
 \end{itemize}
 
+% TODO: falar da função de conversão entre inteiros e reais
 
 
 \section{Conversão de Temperaturas}
@@ -329,7 +333,7 @@ graus Fahrenheit:
 \]
 Podemos dividir ambos os lados da igualdade por 20 e então obter a equação:
 \[
-\frac{F-32}{9} = \frac{C}{5}  \;\;\Rightarrow\;\;  F = \frac{9*C + 32}{5}
+\frac{F-32}{9} = \frac{C}{5}  \;\;\Rightarrow\;\;  F = \frac{9*C}{5} + 32
 \]
 
 Agora que sabemos como converter uma temperatura na escala Celsius para a
@@ -345,7 +349,7 @@ que está listado na figura~\ref{fig:celsius}:
 05  escreva("Digite uma temperatura em graus Celsius: ")
 06  leia(tempC)
 07
-08  tempF = (tempC * 9 + 32) / 5
+08  tempF = (tempC * 9) / 5  +  32
 09
 10  escreva(tempC, "C  equivalem a ", tempF, "F")
 \end{verbatim}
@@ -370,13 +374,12 @@ equação mostrada anteriormente.
 Por fim, na linha 10, imprimimos o valor da temperatura nas duas escalas.
 
 Se fornecermos como entrada do programa a temperatura prevista para hoje em Natal,
-que é de 29\degree C, ele mostrará o valor correspondente de 58.6\degree F.
+que é de 29\degree C, ele mostrará o valor correspondente de 84.2\degree F.
 
 
 \section{Exercícios}
 
 \begin{enumerate}
-
 
 \item Escreva um programa que converte um valor em dólares
 	para o valor correspondente em reais. O seu programa deve
@@ -410,6 +413,23 @@ O hora(s), 3 minuto(s) e 21 segundo(s)
 \end{verbatim}
 \end{itemize}
 
+		\item Dado um número inteiro $n$, imprima
+		os três últimos dígitos de $n$ separados
+		por espaços.
+
+\begin{itemize}
+	\item Exemplos de entrada:
+\begin{verbatim}
+1234
+56
+\end{verbatim}
+
+	\item Exemplos de saída:
+\begin{verbatim}
+2  3  4
+0  5  6
+\end{verbatim}
+\end{itemize}
 
 \begin{comment}
 \item Considere que um caixa de supermercado possui notas de R\$ 50,
@@ -452,13 +472,14 @@ operador de negação da igualdade:
 \end{verbatim}
 
 Podemos aplicar os operadores \textbf{==} e \textbf{nao=} a qualquer
-tipo de valor (e.g., inteiro, real, booleano, texto). Os operadores
-de ordem {\bf }, {\bf <}, {\bf <=} e {\bf >=} podem ser aplicados
-a valores inteiros, reais e textuais, mas não podem ser aplicados
-a valores booleanos. 
+tipo de valor, isto é podemos aplicá-lo a valores inteiros, reais,
+booleanos e textuais. Os operadores de ordem {\bf <}, {\bf >}, {\bf <=} e {\bf >=}
+podem ser aplicados a valores inteiros, reais e textuais, mas não podem ser
+aplicados a valores booleanos. 
 
-Para manipular valores booleanos devemos usar os operadores lógicos.
-Abaixo listamos os operadores lógicos de \Qgol, onde o operarador
+Para manipular valores booleanos devemos usar os operadores lógicos,
+que também produzem como resultado um valor booleano.
+Abaixo listamos os operadores lógicos de \Qgol, onde o operador
 de conjunção (\textbf{e}) e o operador de disjunção (\textbf{ou})
 são operadores binários, enquanto que o operador de negação (\textbf{nao})
 é unário:
@@ -482,8 +503,8 @@ falso & verdadeiro & falso \\ \hline
 verdadeiro & falso & falso \\ \hline
 verdadeiro & verdadeiro & verdadeiro \\ \hline
 \end{tabular}
-\label{tab:ope}
 \caption{Tabela verdade para o operador lógico {\bf e} (conjunção)}
+\label{tab:ope}
 \end{figure}
 
 Já a aplicação do operador \textbf{ou} resultará em um
@@ -501,15 +522,115 @@ falso & verdadeiro & verdadeiro \\ \hline
 verdadeiro & falso & verdadeiro \\ \hline
 verdadeiro & verdadeiro & verdadeiro \\ \hline
 \end{tabular}
-\label{tab:opou}
 \caption{Tabela verdade para o operador lógico {\bf ou} (disjunção)}
+\label{tab:opou}
 \end{figure}
 
+Os operadores \textbf{e} \,e\, \textbf{ou} fazem avaliação
+de curto-circuito, isto é, eles só avaliam o seu segundo
+operando quando necessário. No caso do \textbf{e}, o
+segundo operando só é avaliado se o primeiro for verdadeiro,
+caso contrário já é possível determinar que o resultado
+da conjunção será falso. No caso do \textbf{ou}, o
+segundo operando só é avaliado se o primeiro for falso,
+caso contrário a disjunção será verdadeira.
 
-% TODO: falar da função de conversão entre inteiros e reais
+O operador de negação \textbf{nao} inverte o valor da
+expressão booleana sobre o qual é aplicado. Podemos
+ver a sua tabela verdade na figura~\ref{tab:opnao},
+onde \texttt{exp} representa uma expressão booleana.
+\begin{figure}
+\centering
+\begin{tabular}{|l|l|}
+\hline
+exp & {\bf nao} exp  \\ \hline
+falso & verdaeiro \\ \hline
+verdadeiro & falso  \\ \hline
+\end{tabular}
+\label{tab:opnao}
+\caption{Tabela verdade para o operador lógico {\bf nao} (negação)}
+\end{figure}
+
+O operador \textbf{nao} possui maior precedência do
+que o \textbf{e}, que por sua vez possui maior precedência
+do que o \textbf{ou}.
+
+Vamos ver o uso desses operadores em um programa que imprime
+verdadeiro ou falso dependendo se um aluno foi aprovado ou não
+em uma disciplina. Assuma que o aluno recebeu a nota de duas
+avaliações e para ser aprovado deve ter pelo menos uma nota
+maior ou igual a 7 e não pode tirar nenhuma nota abaixo de 3.
+
+Considerando que \texttt{nota1} e \texttt{nota2} são variáveis
+com os valores da notas do aluno, a seguinte expressão booleana
+verifica as condições de aprovação:
+\begin{verbatim}
+(nota1 >= 7.0 ou nota2 >= 7.0) e nao (nota1 < 3.0) e nao (nota2 < 3.0)
+\end{verbatim} 
+ 
+Note o uso de parênteses para forçar a ordem de avaliação desejada.
+Uma outra maneira de expressar a condição acima seria como abaixo:
+\begin{verbatim}
+(nota1 >= 7.0 ou nota2 >= 7.0) e nota1 >= 3.0 e nota2 >= 3.0
+\end{verbatim}
+
+A figura~\ref{fig:aprovado} apresenta um programa que imprime
+uma mensagem informando se um aluno foi aprovado ou não de
+acordo com a condição acima.
+
+\begin{figure}
+{\small
+\begin{verbatim}
+01  numero nota1, nota2
+02
+03  escreva("Digite a nota da primeira avaliação: ")
+04  leia(nota1)
+05
+06  escreva("Digite a nota da segunda avaliação: ")
+07  leia(nota2)
+08
+09  booleano resultado
+10  resultado = (nota1 >= 7.0 ou nota2 >= 7.0) e nao (nota1 < 3.0) e nao (nota2 < 3.0)
+11
+12  escreva("Aprovado? ", resultado) 
+\end{verbatim}
+\caption{Programa que verifica se um aluno foi aprovado}
+\label{fig:aprovado}
+}
+\end{figure}
+
+Na linha 1 declaramos duas variáveis do tipo \textbf{numero},
+pois as notas de um aluno podem ser valores reias como 5.5 e 8.9.
+Em seguida, nas linhas 3--7, fazemos a leitura das notas. Nas linhas
+9 e 10 declaramos uma variável do tipo booleano e atribuímos a ela
+o resultado da expressão que verifica a condição de aprovação. Por fim,
+na linha 12 imprimimos o resultado.
 
 
+\section{Exercícios}
 
+\begin{enumerate}
+
+\item Implemente um programa que recebe um valor inteiro
+correspondente a um ano e imprime \textbf{verdadeiro} se
+esse ano é bissexto e falso caso contrário. Um ano é bissexto
+se ele é múltiplo de 4 mas não de 100, ou se ele é múltiplo de 400.
+\begin{itemize}
+	\item Exemplos de entrada:
+\begin{verbatim}
+2016
+1900
+2000
+\end{verbatim}
+	\item Exemplos de saída:
+\begin{verbatim}
+verdadeiro
+falso
+verdadeiro
+\end{verbatim}
+\end{itemize}
+
+\end{enumerate}
 
 
 \chapter{Estruturas de Controle}

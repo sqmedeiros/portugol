@@ -5,6 +5,6 @@ numero tempC, tempF
 escreva("Digite uma temperatura em graus Celsius: ")
 leia(tempC)
 
-tempF = (tempC * 9 + 32) / 5
+tempF = (tempC * 9) / 5 + 32
 
 escreva(tempC, "C  equivalem a ", tempF, "F")
