@@ -1,0 +1,15 @@
+sementesorteio(1)
+inteiro i = 1
+
+repita enquanto i <= 5
+	escreva(sorteie(100))
+  i = i + 1
+fim
+
+sementesorteio(2)
+i = 1
+repita enquanto i <= 5
+	escreva(sorteie(100))
+  i = i + 1
+fim
+

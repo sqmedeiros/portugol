@@ -158,6 +158,12 @@ function avaliaExpChamada (exp, ambiente)
 			io.write(s1, " ")
 		end
 		io.write("\n")
+	elseif exp.nome.v == "imprima" then
+		for i, v in ipairs(exp.args) do
+			local e1 = avalia(v, ambiente)
+			local s1 = mytostring(e1)
+			io.write(s1)
+		end
 	elseif exp.nome.v == "leia" then
 		for i, v in ipairs(exp.args) do
 			local x
@@ -202,6 +208,14 @@ function avaliaExpChamada (exp, ambiente)
 		local v = exp.args[1]
 		local s = avalia(v, ambiente)
 		return math.tointeger(s)
+	elseif exp.nome.v == "sorteie" then
+		local v = exp.args[1]
+		local s = avalia(v, ambiente)
+		return math.random(s)
+	elseif exp.nome.v == "sementesorteio" then
+		local v = exp.args[1]
+		local s = avalia(v, ambiente)
+		return math.randomseed(s)
 	else
 		return avaliaExpChamadaAux(exp, ambiente)
 	end			

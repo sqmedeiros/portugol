@@ -107,7 +107,7 @@ local g = re.compile([[
                   ABREPAR  (Exp / ErroExpPar)  (FECHAPAR / ErroFechaPar)  /
                   ChamadaFunc / Numero  / Var  / Cadeia / VERDADEIRO / FALSO
   ChamadaFunc  <- ((FuncPredef -> noId (ABREPAR / ErroFuncPredef) / Nome ABREPAR) ListaExp (FECHAPAR / ErroFechaPar)) -> noChamadaFunc
-  FuncPredef   <- ENTRADA / SAIDA / TEXTOCOMP / TEXTOSUB / TEXTOPOS / CONVINT
+  FuncPredef   <- ENTRADA / SAIDA / TEXTOCOMP / TEXTOSUB / TEXTOPOS / CONVINT / IMPRIMA / SORTEIE / SEMENTESORTEIO
   ListaExp     <- (Exp (VIRG (Exp / ErroExpVirg))*)*
   Var          <- (Nome (ABRECOL (Exp / ErroExpArray) (FECHACOL / ErroFechaCol))*) -> noVar
   Nome         <- !RESERVADA {LETRA RestoNome*} -> noId Sp
@@ -133,6 +133,9 @@ local g = re.compile([[
   RETORNE      <- 'retorne' FimNome -> noKwRetorne
   ENTRADA      <- {'leia'} FimNome
   SAIDA        <- {'escreva'} FimNome
+  IMPRIMA      <- {'imprima'} FimNome
+  SORTEIE      <- {'sorteie'} FimNome
+  SEMENTESORTEIO <- {'sementesorteie'} FimNome
   TEXTOCOMP    <- {'textoComp'} FimNome
   TEXTOSUB     <- {'textoSub'} FimNome
   TEXTOPOS     <- {'textoPos'} FimNome

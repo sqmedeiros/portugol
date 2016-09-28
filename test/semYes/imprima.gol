@@ -1,0 +1,5 @@
+imprima("1 2 3", "\n")
+
+imprima("1\t", "2", "3", "\n")
+
+imprima("\\n", " eita", "\n", "imprimindo\n")

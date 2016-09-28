@@ -119,7 +119,8 @@ local function noReal (v)
 end
 
 local function noTexto (v)
-	return makeNoV(Tag.expTexto, TipoTag.simples, TipoBasico.texto, v)
+	local v = string.gsub(v, "\\t", "\t")
+	return makeNoV(Tag.expTexto, TipoTag.simples, TipoBasico.texto, string.gsub(v, "\\n", "\n"))
 end
 
 local function noBoolFalso ()
