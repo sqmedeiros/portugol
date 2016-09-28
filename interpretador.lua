@@ -10,6 +10,7 @@ local avaliaNovoArrayExp, avaliaExpChamada, decVar
 local getVarArrayRef
 local execBlocoFuncao
 local valRetorno, auxRetorno, tagRetorno = nil, nil, nil
+local flagRetorno = false 
 
 local function avalia (exp, ambiente)
 	assert(ambiente ~= nil)
@@ -311,7 +312,7 @@ end
 
 local function execCmdRepita (c, ambiente)
 	local exp = avalia(c.exp, ambiente)
-	while exp do
+	while exp and not flagRetorno do
 		execBloco(c.bloco, ambiente)
 		exp = avalia(c.exp, ambiente)
 	end
@@ -359,6 +360,7 @@ local function execCmd (c, ambiente)
 	elseif c.tag == Tag.cmdRetorne then
 		valRetorno, auxRetorno = avalia(c.exp, ambiente)
 		tagRetorno = c.exp.tag
+    flagRetorno = true
 	else
 		error("Comando desconhecido")
 	end
@@ -370,6 +372,10 @@ function execBlocoFuncao (bloco, ambiente)
 			decVarLista(v, ambiente)
 		else -- eh comando
 			execCmd(v, ambiente)
+      if flagRetorno then
+				flagRetorno = false
+				return
+			end
 		end	
 	end
 end
@@ -385,6 +391,10 @@ function execBloco (bloco, ambiente)
 			decFuncao(v, ambiente)
 		else -- eh comando
 			execCmd(v, ambiente)
+      if flagRetorno then
+				tab.saiBloco(ambiente)
+				return
+			end
 		end	
 	end
 

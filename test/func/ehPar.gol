@@ -1,0 +1,11 @@
+funcao ehPar (inteiro x) retorna booleano
+  se x mod 2 == 0
+    retorne verdadeiro
+  fim
+  retorne falso
+fim
+
+escreva("Eh par 2?", ehPar(2))
+escreva("Eh par 33?", ehPar(33))
+escreva("Eh par 25?", ehPar(25))
+escreva("Eh par 48?", ehPar(48))

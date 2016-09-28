@@ -1,0 +1,20 @@
+funcao ehPrimo (inteiro x) retorna booleano
+  inteiro i = 2
+
+  repita enquanto i < x
+    se x mod i == 0
+      //escreva("Vai retornar 123")
+      retorne falso
+    fim
+    i = i + 1
+  fim 
+	
+  retorne verdadeiro 
+fim
+
+escreva("Eh primo 2?", ehPrimo(2))
+escreva("Eh primo 3?", ehPrimo(3))
+escreva("Eh primo 4?", ehPrimo(4))
+escreva("Eh primo 5?", ehPrimo(5))
+escreva("Eh primo 6?", ehPrimo(6))
+escreva("Eh primo 16?", ehPrimo(16))
