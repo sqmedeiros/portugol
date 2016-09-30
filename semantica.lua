@@ -340,7 +340,7 @@ function analisaExpChamada (exp, ambiente)
 			erro("função converteInt espera parâmetro do tipo 'numero' ou 'inteiro'", v1.linha)
 		end
 		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.inteiro)
-	elseif exp.nome.v == "sorteie" or exp.nome.v == "sementesorteio" then
+	elseif exp.nome.v == "sorteie" then
 		if #exp.args ~= 1 then
 			erro("função 'sorteie' espera 1 parâmetro, mas foi chamada com " .. #exp.args, exp.nome.linha)
 			return
@@ -351,6 +351,19 @@ function analisaExpChamada (exp, ambiente)
 			erro("função 'sorteie' espera parâmetro do tipo 'inteiro'", v1.linha)
 		end
 		exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.inteiro)
+	elseif exp.nome.v == "sementesorteio" then
+		if #exp.args ~= 1 and #exp.args ~= 0 then
+			erro("função 'sementesorteio' espera 0 ou 1 parâmetro, mas foi chamada com " .. #exp.args, exp.nome.linha)
+			return
+		end
+		if #exp.args == 1 then
+			local v1 = exp.args[1]	
+			analisaExp(v1, ambiente)
+			if (v1.tipo.basico ~= TipoBasico.inteiro) or not ehValorBasico(v1, ambiente) then
+				erro("função 'sementesorteio' espera parâmetro do tipo 'inteiro'", v1.linha)
+			end
+			exp.tipo = arvore.makeTipo(TipoTag.simples, TipoBasico.inteiro)
+		end
 	else
 		analisaExpChamadaAux(exp, ambiente)
 	end

@@ -213,8 +213,13 @@ function avaliaExpChamada (exp, ambiente)
 		local s = avalia(v, ambiente)
 		return math.random(s)
 	elseif exp.nome.v == "sementesorteio" then
-		local v = exp.args[1]
-		local s = avalia(v, ambiente)
+		local s
+		if #exp.args == 1 then
+			local v = exp.args[1]
+			s = avalia(v, ambiente)
+		else
+			s = os.time()
+		end
 		return math.randomseed(s)
 	else
 		return avaliaExpChamadaAux(exp, ambiente)
